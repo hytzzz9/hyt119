@@ -1,0 +1,33 @@
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node / Package (none in this project, but safe defaults)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# Trae / Agent local state
+.trae/
+.trae-cn/
+
+# Local previews / temp
+*.local
+.cache/
+.tmp/
+temp/
+
+# Env / secrets (never commit these)
+.env
+.env.local
+.env.*.local
+
+# Git history / lock
+.gitattributes
