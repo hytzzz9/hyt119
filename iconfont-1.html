@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glyph · Font Awesome | 侯雨彤</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="cdn/fontawesome/css/all.min.css">
+    <style>
+        /* ---------- 画廊深墨 · 设计系统 ---------- */
+        :root {
+            --hyt-ink:        #0C0C0E;
+            --hyt-ink-2:      #151519;
+            --hyt-gold:       #D4AF37;
+            --hyt-gold-soft:  rgba(212, 175, 55, .35);
+            --hyt-paper:      #F2EDE4;
+            --hyt-paper-dim:  rgba(242, 237, 228, .55);
+            --hyt-sienna:     #8B4513;
+            --hyt-rule:       rgba(212, 175, 55, .18);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--hyt-ink);
+            color: var(--hyt-paper);
+            font-family: "Inter", "Microsoft YaHei", sans-serif;
+            font-weight: 300;
+            line-height: 1.7;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 背景纹理 —— 微妙的金箔噪点 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% -10%, rgba(212, 175, 55, .12) 0%, transparent 60%),
+                repeating-linear-gradient(0deg, rgba(212, 175, 55, .015) 0, rgba(212, 175, 55, .015) 1px, transparent 1px, transparent 3px);
+            z-index: 0;
+        }
+
+        /* ---------- 顶栏 ---------- */
+        .hyt-topbar {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 28px clamp(28px, 7vw, 96px);
+            border-bottom: 1px solid var(--hyt-rule);
+        }
+
+        .hyt-topbar-brand {
+            font-family: "Playfair Display", serif;
+            font-style: italic;
+            font-size: 20px;
+            color: var(--hyt-gold);
+            text-decoration: none;
+            letter-spacing: .02em;
+        }
+
+        .hyt-topbar-nav {
+            display: flex;
+            gap: 32px;
+            font-size: 12px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+        }
+
+        .hyt-topbar-nav a {
+            color: var(--hyt-paper-dim);
+            text-decoration: none;
+            transition: color .2s ease;
+        }
+
+        .hyt-topbar-nav a:hover { color: var(--hyt-gold); }
+
+        /* ---------- Hero 区 ---------- */
+        .hyt-hero {
+            position: relative;
+            z-index: 2;
+            padding: clamp(64px, 12vw, 160px) clamp(28px, 7vw, 96px) clamp(48px, 8vw, 96px);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hyt-hero-eyebrow {
+            font-size: 11px;
+            letter-spacing: .32em;
+            text-transform: uppercase;
+            color: var(--hyt-gold);
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hyt-hero-eyebrow::before {
+            content: "";
+            width: 48px;
+            height: 1px;
+            background: var(--hyt-gold);
+        }
+
+        .hyt-hero-title {
+            font-family: "Playfair Display", serif;
+            font-weight: 400;
+            font-size: clamp(56px, 11vw, 148px);
+            line-height: .92;
+            letter-spacing: -.02em;
+            margin-bottom: 32px;
+        }
+
+        .hyt-hero-title em {
+            font-style: italic;
+            color: var(--hyt-gold);
+        }
+
+        .hyt-hero-meta {
+            display: flex;
+            gap: 56px;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid var(--hyt-rule);
+            max-width: 720px;
+        }
+
+        .hyt-hero-meta-item { font-size: 13px; }
+        .hyt-hero-meta-item strong {
+            display: block;
+            font-family: "Playfair Display", serif;
+            font-size: 28px;
+            font-weight: 400;
+            color: var(--hyt-gold);
+            margin-bottom: 6px;
+        }
+
+        /* ---------- 章节标题 ---------- */
+        .hyt-section-head {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto 48px;
+            padding: 0 clamp(28px, 7vw, 96px);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 24px;
+        }
+
+        .hyt-section-head h2 {
+            font-family: "Playfair Display", serif;
+            font-weight: 400;
+            font-size: clamp(28px, 4vw, 48px);
+            letter-spacing: .01em;
+        }
+
+        .hyt-section-head p {
+            font-size: 12px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--hyt-paper-dim);
+            white-space: nowrap;
+        }
+
+        /* ---------- 主展示网格 ---------- */
+        .hyt-gallery {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(28px, 7vw, 96px) clamp(72px, 10vw, 120px);
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1px;
+            background: var(--hyt-rule);
+        }
+
+        .hyt-tile {
+            position: relative;
+            aspect-ratio: 1;
+            background: var(--hyt-ink);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: inherit;
+            transition: background .35s ease, transform .35s ease;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .hyt-tile:hover {
+            background: var(--hyt-ink-2);
+        }
+
+        .hyt-tile:hover .hyt-tile-icon {
+            transform: scale(1.18);
+            color: var(--hyt-gold);
+        }
+
+        .hyt-tile-icon {
+            font-size: clamp(36px, 5vw, 52px);
+            color: var(--hyt-paper);
+            transition: transform .45s cubic-bezier(.25, .8, .25, 1), color .35s ease;
+            margin-bottom: 14px;
+            filter: drop-shadow(0 2px 12px rgba(212, 175, 55, .08));
+        }
+
+        .hyt-tile-label {
+            font-family: "Playfair Display", serif;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--hyt-paper-dim);
+            letter-spacing: .02em;
+            text-align: center;
+        }
+
+        /* 装饰角标 */
+        .hyt-tile::before {
+            content: "";
+            position: absolute;
+            top: 12px; left: 12px;
+            width: 16px; height: 16px;
+            border-top: 1px solid var(--hyt-gold-soft);
+            border-left: 1px solid var(--hyt-gold-soft);
+            opacity: 0;
+            transition: opacity .35s ease;
+        }
+
+        .hyt-tile::after {
+            content: "";
+            position: absolute;
+            bottom: 12px; right: 12px;
+            width: 16px; height: 16px;
+            border-bottom: 1px solid var(--hyt-gold-soft);
+            border-right: 1px solid var(--hyt-gold-soft);
+            opacity: 0;
+            transition: opacity .35s ease;
+        }
+
+        .hyt-tile:hover::before,
+        .hyt-tile:hover::after { opacity: 1; }
+
+        /* ---------- 精选横幅 ---------- */
+        .hyt-featured {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: clamp(48px, 8vw, 80px) clamp(28px, 7vw, 96px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(28px, 6vw, 72px);
+            align-items: center;
+            border-top: 1px solid var(--hyt-rule);
+        }
+
+        .hyt-featured-label {
+            font-size: 10px;
+            letter-spacing: .3em;
+            text-transform: uppercase;
+            color: var(--hyt-gold);
+            margin-bottom: 20px;
+        }
+
+        .hyt-featured-text h3 {
+            font-family: "Playfair Display", serif;
+            font-weight: 400;
+            font-size: clamp(28px, 3.5vw, 40px);
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .hyt-featured-text p {
+            color: var(--hyt-paper-dim);
+            font-size: 14px;
+            max-width: 48ch;
+        }
+
+        .hyt-featured-icon-row {
+            display: flex;
+            justify-content: center;
+            gap: clamp(24px, 4vw, 48px);
+            flex-wrap: wrap;
+        }
+
+        .hyt-featured-icon-row i {
+            font-size: clamp(48px, 7vw, 80px);
+            color: var(--hyt-gold);
+            opacity: .85;
+            transition: transform .35s ease, opacity .35s ease;
+        }
+
+        .hyt-featured-icon-row i:hover {
+            transform: translateY(-6px) scale(1.1);
+            opacity: 1;
+        }
+
+        /* ---------- 页脚 ---------- */
+        .hyt-footer {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px clamp(28px, 7vw, 96px) 56px;
+            border-top: 1px solid var(--hyt-rule);
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--hyt-paper-dim);
+        }
+
+        .hyt-footer a {
+            color: var(--hyt-gold);
+            text-decoration: none;
+        }
+
+        /* ---------- 响应式 ---------- */
+        @media (max-width: 768px) {
+            .hyt-topbar-nav { display: none; }
+            .hyt-hero-meta { flex-direction: column; gap: 28px; }
+            .hyt-featured { grid-template-columns: 1fr; }
+            .hyt-section-head { flex-direction: column; align-items: flex-start; }
+        }
+
+        @media (max-width: 480px) {
+            .hyt-gallery { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶栏 -->
+    <header class="hyt-topbar">
+        <a class="hyt-topbar-brand" href="index.html">— 侯雨彤</a>
+        <nav class="hyt-topbar-nav">
+            <a href="index.html">目录</a>
+            <a href="iconfont-2.html">Lucide</a>
+            <a href="#gallery">图标</a>
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hyt-hero">
+        <p class="hyt-hero-eyebrow">Module 10 · Font Awesome</p>
+        <h1 class="hyt-hero-title">Glyphs of the<br><em>Studio</em>.</h1>
+        <p style="max-width: 52ch; color: var(--hyt-paper-dim); font-size: 15px; margin-top: 24px;">
+            从 2012 年至今，Font Awesome 一直是网页图标领域最常被引用的字体库。
+            这里用字体文件的方式载入，展示 Solid、Regular 与 Brands 三种风格共约二十枚精选。
+        </p>
+        <div class="hyt-hero-meta">
+            <div class="hyt-hero-meta-item">
+                <strong>Free</strong>
+                Open Source · MIT License
+            </div>
+            <div class="hyt-hero-meta-item">
+                <strong>6.5.2</strong>
+                Version · 2024
+            </div>
+            <div class="hyt-hero-meta-item">
+                <strong>20+</strong>
+                Selected glyphs
+            </div>
+        </div>
+    </section>
+
+    <!-- 主图标网格 -->
+    <div id="gallery" class="hyt-section-head">
+        <h2>Gallery — Selected</h2>
+        <p>Solid · Regular · Brands</p>
+    </div>
+
+    <section class="hyt-gallery">
+        <!-- Solid 风格 -->
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-feather-pointed"></i><span class="hyt-tile-label">Feather</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-palette"></i><span class="hyt-tile-label">Palette</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-brush"></i><span class="hyt-tile-label">Brush</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-pen-nib"></i><span class="hyt-tile-label">Nib</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-compass"></i><span class="hyt-tile-label">Compass</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-camera-retro"></i><span class="hyt-tile-label">Camera</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-music"></i><span class="hyt-tile-label">Music</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-film"></i><span class="hyt-tile-label">Film</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-book-open"></i><span class="hyt-tile-label">Book</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-solid fa-crown"></i><span class="hyt-tile-label">Crown</span></a>
+
+        <!-- Regular 风格 -->
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-regular fa-star"></i><span class="hyt-tile-label">Star</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-regular fa-heart"></i><span class="hyt-tile-label">Heart</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-regular fa-image"></i><span class="hyt-tile-label">Image</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-regular fa-comment"></i><span class="hyt-tile-label">Comment</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-regular fa-envelope"></i><span class="hyt-tile-label">Mail</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-regular fa-clock"></i><span class="hyt-tile-label">Clock</span></a>
+
+        <!-- Brands -->
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-brands fa-instagram"></i><span class="hyt-tile-label">Instagram</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-brands fa-dribbble"></i><span class="hyt-tile-label">Dribbble</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-brands fa-behance"></i><span class="hyt-tile-label">Behance</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-brands fa-github"></i><span class="hyt-tile-label">GitHub</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-brands fa-twitter"></i><span class="hyt-tile-label">X / Twitter</span></a>
+        <a class="hyt-tile" href="#"><i class="hyt-tile-icon fa-brands fa-youtube"></i><span class="hyt-tile-label">YouTube</span></a>
+    </section>
+
+    <!-- 精选横幅 -->
+    <section class="hyt-featured">
+        <div class="hyt-featured-text">
+            <p class="hyt-featured-label">Featured · Style Comparison</p>
+            <h3>同一枚图标，<br>三种重量</h3>
+            <p>Font Awesome 6 提供 Solid、Regular、Thin（Pro）与 Brands 多套字重。
+               下方四枚用同一个展示方法观察同一图标在不同字重下的视觉表达差异。</p>
+        </div>
+        <div class="hyt-featured-icon-row">
+            <i class="fa-solid fa-moon"></i>
+            <i class="fa-regular fa-moon"></i>
+            <i class="fa-solid fa-sun"></i>
+            <i class="fa-regular fa-sun"></i>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="hyt-footer">
+        <span>侯雨彤 · Advanced Web Design</span>
+        <a href="index.html">← 返回目录</a>
+    </footer>
+</body>
+</html>

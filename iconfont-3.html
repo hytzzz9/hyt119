@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bottom Nav · Font Icon | 侯雨彤</title>
+    <link rel="stylesheet" href="font/iconfont.css">
+    <style>
+        /* ---------- 移动端底部导航 · 字体图标 ---------- */
+        :root {
+            --hyt-nav-bg:          #FFFFFF;
+            --hyt-nav-border:      rgba(0, 0, 0, .08);
+            --hyt-nav-inactive:    #9A9A9A;
+            --hyt-nav-active:      #FF6B35;
+            --hyt-nav-text:        #1A1A1A;
+            --hyt-badge-red:       #FF3B30;
+            --hyt-badge-bg:        #FFFFFF;
+            --hyt-page-bg:         #F2F2F7;
+            --hyt-content-card:    #FFFFFF;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #E8E8EF 0%, #F2F2F7 60%, #FFFFFF 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 16px;
+            color: var(--hyt-nav-text);
+        }
+
+        /* 手机模拟器容器 —— 自适应宽度，桌面居中模拟 */
+        .hyt-phone {
+            width: 100%;
+            max-width: 420px;
+            min-height: 680px;
+            background: var(--hyt-page-bg);
+            border-radius: 32px;
+            box-shadow:
+                0 0 0 12px #1A1A1A,
+                0 0 0 14px #2D2D2D,
+                0 32px 80px rgba(0, 0, 0, .35);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 刘海 */
+        .hyt-notch {
+            width: 120px;
+            height: 28px;
+            background: #1A1A1A;
+            border-radius: 0 0 18px 18px;
+            margin: 0 auto;
+        }
+
+        /* 状态栏 */
+        .hyt-statusbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 28px 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .hyt-statusbar-right {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        /* 页面内容区 */
+        .hyt-content {
+            flex: 1;
+            padding: 16px 20px 0;
+            overflow-y: auto;
+        }
+
+        .hyt-page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .hyt-page-sub {
+            font-size: 14px;
+            color: #8E8E93;
+            margin-bottom: 24px;
+        }
+
+        .hyt-demo-label {
+            font-size: 11px;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: #8E8E93;
+            margin-bottom: 12px;
+            padding-left: 4px;
+        }
+
+        .hyt-content-card {
+            background: var(--hyt-content-card);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, .04);
+        }
+
+        .hyt-content-card h3 {
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .hyt-content-card p {
+            font-size: 13px;
+            color: #8E8E93;
+            line-height: 1.6;
+        }
+
+        /* ---------- 底部导航栏 ---------- */
+        .hyt-tabbar {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--hyt-nav-bg);
+            border-top: 1px solid var(--hyt-nav-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+            z-index: 100;
+        }
+
+        /* 每个 tab item */
+        .hyt-tab {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: var(--hyt-nav-inactive);
+            position: relative;
+            padding: 6px 0;
+            transition: color .25s ease;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .hyt-tab:active { transform: scale(.92); }
+
+        /* 图标容器 —— 徽章定位 */
+        .hyt-tab-icon-wrap {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 3px;
+        }
+
+        /* iconfont 字体图标 —— 覆盖默认大小 */
+        .hyt-tab-icon-wrap .iconfont {
+            font-size: 24px;
+            color: inherit;
+            transition: transform .25s ease;
+        }
+
+        .hyt-tab-label {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: .02em;
+        }
+
+        /* 激活状态 */
+        .hyt-tab.is-active {
+            color: var(--hyt-nav-active);
+        }
+
+        .hyt-tab.is-active .hyt-tab-icon-wrap .iconfont {
+            transform: translateY(-2px);
+        }
+
+        /* ---------- 徽章 ---------- */
+
+        /* 数字徽章 */
+        .hyt-badge {
+            position: absolute;
+            top: -4px;
+            right: -10px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            background: var(--hyt-badge-red);
+            color: #FFFFFF;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 18px;
+            text-align: center;
+            border-radius: 9px;
+            border: 2px solid var(--hyt-nav-bg);
+            box-sizing: content-box;
+            font-family: inherit;
+            z-index: 10;
+        }
+
+        /* 红点（无数字，实心小圆） */
+        .hyt-dot {
+            position: absolute;
+            top: -2px;
+            right: -6px;
+            width: 9px;
+            height: 9px;
+            background: var(--hyt-badge-red);
+            border-radius: 50%;
+            border: 2px solid var(--hyt-nav-bg);
+            z-index: 10;
+            animation: hyt-pulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes hyt-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.25); opacity: .7; }
+        }
+
+        /* ---------- 说明页脚 ---------- */
+        .hyt-footer-note {
+            text-align: center;
+            padding: 16px 20px 24px;
+            font-size: 11px;
+            color: #8E8E93;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+        }
+
+        .hyt-footer-note a {
+            color: var(--hyt-nav-active);
+            text-decoration: none;
+        }
+
+        /* ---------- 桌面端展示模式 ---------- */
+        @media (min-width: 520px) {
+            body::before {
+                content: "Module 12 · iconfont 字体图标 · 移动端底部导航";
+                display: block;
+                position: absolute;
+                top: 16px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 11px;
+                letter-spacing: .3em;
+                text-transform: uppercase;
+                color: #8E8E93;
+            }
+        }
+
+        /* 手机以下宽度 —— 模拟真实设备 */
+        @media (max-width: 420px) {
+            body { padding: 0; background: var(--hyt-page-bg); align-items: stretch; }
+            .hyt-phone {
+                max-width: none;
+                min-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hyt-phone">
+        <!-- 刘海 -->
+        <div class="hyt-notch"></div>
+
+        <!-- 状态栏 -->
+        <div class="hyt-statusbar">
+            <span>9:41</span>
+            <span class="hyt-statusbar-right">●●●●●▯ 100%</span>
+        </div>
+
+        <!-- 内容区 -->
+        <main class="hyt-content">
+            <h1 class="hyt-page-title">发现</h1>
+            <p class="hyt-page-sub">今天有 3 条新消息等待你查看</p>
+
+            <p class="hyt-demo-label">底部导航栏 · 演示内容</p>
+
+            <article class="hyt-content-card">
+                <h3>⭐ 首页</h3>
+                <p>当前为激活态的「首页」tab，右上角有红色脉冲圆点，表示有未读提醒。</p>
+            </article>
+
+            <article class="hyt-content-card">
+                <h3>🍉 发现</h3>
+                <p>第二个 tab 使用 iconfont 的「西瓜」图标，作为发现/分类入口。</p>
+            </article>
+
+            <article class="hyt-content-card">
+                <h3>🍎 购物 · 徽章 "3"</h3>
+                <p>第三个 tab 右上角显示红色数字徽章 3，表示购物车或消息中心有 3 条新条目。</p>
+            </article>
+
+            <article class="hyt-content-card">
+                <h3>📱 我的</h3>
+                <p>第四个 tab 使用「智能手机」图标，代表个人中心。无徽章无红点，完全安静的状态。</p>
+            </article>
+
+            <div style="height: 20px;"></div>
+        </main>
+
+        <!-- 底部导航栏 -->
+        <nav class="hyt-tabbar" aria-label="底部导航">
+
+            <!-- Tab 1：首页（激活态 + 红点） -->
+            <a class="hyt-tab is-active" href="#">
+                <div class="hyt-tab-icon-wrap">
+                    <i class="iconfont icon-xingxing"></i>
+                    <span class="hyt-dot" aria-label="有未读提醒"></span>
+                </div>
+                <span class="hyt-tab-label">首页</span>
+            </a>
+
+            <!-- Tab 2：发现（无徽章） -->
+            <a class="hyt-tab" href="#">
+                <div class="hyt-tab-icon-wrap">
+                    <i class="iconfont icon-xigua"></i>
+                </div>
+                <span class="hyt-tab-label">发现</span>
+            </a>
+
+            <!-- Tab 3：购物（数字徽章 3） -->
+            <a class="hyt-tab" href="#">
+                <div class="hyt-tab-icon-wrap">
+                    <i class="iconfont icon-pingguo"></i>
+                    <span class="hyt-badge" aria-label="3 条未读">3</span>
+                </div>
+                <span class="hyt-tab-label">购物</span>
+            </a>
+
+            <!-- Tab 4：我的（无徽章） -->
+            <a class="hyt-tab" href="#">
+                <div class="hyt-tab-icon-wrap">
+                    <i class="iconfont icon-zhinengshouji"></i>
+                </div>
+                <span class="hyt-tab-label">我的</span>
+            </a>
+
+        </nav>
+
+        <div class="hyt-footer-note"><a href="index.html">← 返回目录</a></div>
+    </div>
+
+    <script>
+        // 激活态切换演示
+        document.querySelectorAll('.hyt-tab').forEach(function (hytTab) {
+            hytTab.addEventListener('click', function (hytEvent) {
+                hytEvent.preventDefault();
+                document.querySelectorAll('.hyt-tab').forEach(function (t) { t.classList.remove('is-active'); });
+                hytTab.classList.add('is-active');
+            });
+        });
+    </script>
+</body>
+</html>

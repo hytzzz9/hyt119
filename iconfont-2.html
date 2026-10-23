@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linework · Lucide | 侯雨彤</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ---------- 编辑纸感 · 设计系统 ---------- */
+        :root {
+            --hyt-paper:      #F6F4EE;
+            --hyt-paper-2:    #EFEBE2;
+            --hyt-paper-3:    #E8E3D7;
+            --hyt-ink:        #1F1F1F;
+            --hyt-ink-dim:    #5A564E;
+            --hyt-terracotta: #B94B3F;
+            --hyt-sage:       #5E7A5D;
+            --hyt-sand:       #C9A96E;
+            --hyt-rule:       rgba(31, 31, 31, .12);
+            --hyt-rule-thick: rgba(31, 31, 31, .25);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--hyt-paper);
+            color: var(--hyt-ink);
+            font-family: "Inter", "Microsoft YaHei", system-ui, sans-serif;
+            font-weight: 300;
+            line-height: 1.75;
+            min-height: 100vh;
+        }
+
+        /* 纸张纹理 —— 微妙的纤维感 */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse 60% 50% at 20% 80%, rgba(185, 75, 63, .05) 0%, transparent 55%),
+                radial-gradient(ellipse 50% 60% at 85% 15%, rgba(94, 122, 93, .06) 0%, transparent 55%),
+                repeating-linear-gradient(90deg, rgba(31, 31, 31, .008) 0, rgba(31, 31, 31, .008) 1px, transparent 1px, transparent 4px);
+            z-index: 0;
+        }
+
+        /* ---------- 顶栏 ---------- */
+        .hyt-topbar {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            padding: 24px clamp(24px, 6vw, 80px);
+            border-bottom: 2px solid var(--hyt-ink);
+        }
+
+        .hyt-topbar-brand {
+            font-family: "Cormorant Garamond", Georgia, serif;
+            font-style: italic;
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--hyt-ink);
+            text-decoration: none;
+        }
+
+        .hyt-topbar-issue {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 14px;
+            letter-spacing: .08em;
+            color: var(--hyt-ink-dim);
+        }
+
+        .hyt-topbar-nav {
+            justify-self: end;
+            display: flex;
+            gap: 28px;
+            font-size: 11px;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+        }
+
+        .hyt-topbar-nav a {
+            color: var(--hyt-ink-dim);
+            text-decoration: none;
+            transition: color .2s ease;
+        }
+
+        .hyt-topbar-nav a:hover { color: var(--hyt-terracotta); }
+
+        /* ---------- Masthead ---------- */
+        .hyt-masthead {
+            position: relative;
+            z-index: 2;
+            padding: clamp(40px, 6vw, 72px) clamp(24px, 6vw, 80px) 48px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hyt-masthead-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 10px;
+            letter-spacing: .32em;
+            text-transform: uppercase;
+            color: var(--hyt-terracotta);
+            margin-bottom: 36px;
+        }
+
+        .hyt-masthead-label::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--hyt-terracotta);
+            max-width: 120px;
+        }
+
+        .hyt-masthead-title {
+            font-family: "Cormorant Garamond", Georgia, serif;
+            font-weight: 400;
+            font-size: clamp(72px, 14vw, 180px);
+            line-height: .88;
+            letter-spacing: -.03em;
+            margin-bottom: 24px;
+        }
+
+        .hyt-masthead-title em {
+            font-style: italic;
+            color: var(--hyt-terracotta);
+        }
+
+        .hyt-masthead-sub {
+            font-family: "Cormorant Garamond", serif;
+            font-size: clamp(18px, 2.2vw, 26px);
+            color: var(--hyt-ink-dim);
+            max-width: 48ch;
+            margin-left: auto;
+            text-align: right;
+            border-top: 1px solid var(--hyt-rule-thick);
+            padding-top: 16px;
+        }
+
+        .hyt-masthead-meta {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-top: 56px;
+            padding-top: 28px;
+            border-top: 1px solid var(--hyt-rule);
+            border-bottom: 1px solid var(--hyt-rule);
+        }
+
+        .hyt-meta-item { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--hyt-ink-dim); }
+        .hyt-meta-item strong {
+            display: block;
+            font-family: "Cormorant Garamond", serif;
+            font-size: 32px;
+            font-weight: 400;
+            color: var(--hyt-ink);
+            letter-spacing: 0;
+            text-transform: none;
+            margin-bottom: 4px;
+        }
+
+        /* ---------- 编辑栏目标题 ---------- */
+        .hyt-column-head {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto 8px;
+            padding: 48px clamp(24px, 6vw, 80px) 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--hyt-ink);
+            padding-bottom: 12px;
+        }
+
+        .hyt-column-head h2 {
+            font-family: "Cormorant Garamond", serif;
+            font-weight: 600;
+            font-size: clamp(24px, 2.8vw, 32px);
+            letter-spacing: .01em;
+        }
+
+        .hyt-column-head span {
+            font-size: 10px;
+            letter-spacing: .3em;
+            text-transform: uppercase;
+            color: var(--hyt-ink-dim);
+        }
+
+        /* ---------- 图标网格 ---------- */
+        .hyt-editorial-grid {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 clamp(24px, 6vw, 80px) clamp(72px, 10vw, 120px);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+        }
+
+        .hyt-card {
+            position: relative;
+            aspect-ratio: 4/5;
+            padding: clamp(16px, 2vw, 28px);
+            border: 1px solid var(--hyt-rule);
+            background: var(--hyt-paper);
+            display: flex;
+            flex-direction: column;
+            transition: background .3s ease, transform .3s ease;
+            cursor: pointer;
+        }
+
+        .hyt-card:hover { background: var(--hyt-paper-2); }
+
+        .hyt-card:hover .hyt-card-icon {
+            stroke: var(--hyt-terracotta);
+            transform: scale(1.08);
+        }
+
+        .hyt-card-num {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--hyt-ink-dim);
+            letter-spacing: .04em;
+        }
+
+        .hyt-card-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hyt-card-icon {
+            width: clamp(40px, 5vw, 56px);
+            height: clamp(40px, 5vw, 56px);
+            stroke: var(--hyt-ink);
+            stroke-width: 1.6;
+            transition: stroke .3s ease, transform .35s cubic-bezier(.25, .8, .25, 1);
+        }
+
+        .hyt-card-caption {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--hyt-ink);
+            letter-spacing: .02em;
+            margin-top: auto;
+        }
+
+        .hyt-card-sub {
+            font-size: 10px;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--hyt-ink-dim);
+            margin-top: 2px;
+        }
+
+        /* 不同装饰色的变体 */
+        .hyt-card--accent-terracotta .hyt-card-icon { stroke: var(--hyt-terracotta); }
+        .hyt-card--accent-sage .hyt-card-icon { stroke: var(--hyt-sage); }
+        .hyt-card--accent-sand .hyt-card-icon { stroke: var(--hyt-sand); }
+        .hyt-card--accent-terracotta:hover { background: rgba(185, 75, 63, .06); }
+        .hyt-card--accent-sage:hover { background: rgba(94, 122, 93, .06); }
+        .hyt-card--accent-sand:hover { background: rgba(201, 169, 110, .08); }
+
+        /* ---------- 编辑专栏 ---------- */
+        .hyt-editorial {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: clamp(48px, 8vw, 96px) clamp(24px, 6vw, 80px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(32px, 6vw, 72px);
+            border-top: 2px solid var(--hyt-ink);
+        }
+
+        .hyt-editorial-copy h3 {
+            font-family: "Cormorant Garamond", serif;
+            font-weight: 600;
+            font-size: clamp(28px, 3.5vw, 44px);
+            line-height: 1.08;
+            margin-bottom: 20px;
+        }
+
+        .hyt-editorial-copy p {
+            font-size: 14px;
+            color: var(--hyt-ink-dim);
+            max-width: 48ch;
+            margin-bottom: 14px;
+        }
+
+        .hyt-editorial-copy p:first-of-type::first-letter {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 72px;
+            font-weight: 600;
+            float: left;
+            line-height: .8;
+            padding: 6px 10px 0 0;
+            color: var(--hyt-terracotta);
+        }
+
+        .hyt-editorial-side {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(16px, 3vw, 28px);
+            align-content: center;
+            justify-content: center;
+        }
+
+        .hyt-editorial-side div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hyt-editorial-side i {
+            width: clamp(32px, 4vw, 48px);
+            height: clamp(32px, 4vw, 48px);
+            stroke: var(--hyt-ink);
+            stroke-width: 1.4;
+            transition: stroke .3s ease, stroke-width .3s ease;
+        }
+
+        .hyt-editorial-side i:hover { stroke: var(--hyt-terracotta); stroke-width: 2; }
+
+        .hyt-editorial-side span {
+            font-family: "Cormorant Garamond", serif;
+            font-size: 13px;
+            font-style: italic;
+            color: var(--hyt-ink-dim);
+        }
+
+        /* ---------- 页脚 ---------- */
+        .hyt-footer {
+            position: relative;
+            z-index: 2;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px clamp(24px, 6vw, 80px) 48px;
+            border-top: 1px solid var(--hyt-rule-thick);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: "Cormorant Garamond", serif;
+            font-size: 13px;
+            color: var(--hyt-ink-dim);
+            font-style: italic;
+        }
+
+        .hyt-footer a {
+            color: var(--hyt-terracotta);
+            text-decoration: none;
+            font-family: "Inter", sans-serif;
+            font-style: normal;
+            font-size: 10px;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+        }
+
+        /* ---------- 响应式 ---------- */
+        @media (max-width: 960px) {
+            .hyt-editorial-grid { grid-template-columns: repeat(3, 1fr); }
+            .hyt-masthead-meta { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .hyt-topbar-nav { display: none; }
+            .hyt-topbar-issue { display: none; }
+            .hyt-topbar { grid-template-columns: 1fr; }
+            .hyt-editorial { grid-template-columns: 1fr; }
+            .hyt-masthead-sub { text-align: left; margin-left: 0; }
+        }
+
+        @media (max-width: 520px) {
+            .hyt-editorial-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 顶栏 -->
+    <header class="hyt-topbar">
+        <a class="hyt-topbar-brand" href="index.html">— 侯雨彤</a>
+        <span class="hyt-topbar-issue">Vol. II · Lucide · 2026</span>
+        <nav class="hyt-topbar-nav">
+            <a href="index.html">目录</a>
+            <a href="iconfont-1.html">FA</a>
+            <a href="#grid">Gallery</a>
+        </nav>
+    </header>
+
+    <!-- Masthead -->
+    <section class="hyt-masthead">
+        <p class="hyt-masthead-label">Module 11 · Lucide Icons</p>
+        <h1 class="hyt-masthead-title">The Art of<br><em>Linework</em>.</h1>
+        <p class="hyt-masthead-sub">
+            一套由 Paperplane 团队维护的开源 SVG 图标集合，
+            以细线、中性字重和统一几何为基调。
+        </p>
+        <div class="hyt-masthead-meta">
+            <div class="hyt-meta-item"><strong>SVG</strong>Format</div>
+            <div class="hyt-meta-item"><strong>ISC</strong>License</div>
+            <div class="hyt-meta-item"><strong>0.441</strong>Version</div>
+            <div class="hyt-meta-item"><strong>24×24</strong>Base grid</div>
+        </div>
+    </section>
+
+    <!-- 编辑标题 -->
+    <div id="grid" class="hyt-column-head">
+        <h2>Gallery — Selected Plates</h2>
+        <span>Lucide · 24 icons</span>
+    </div>
+
+    <!-- 图标网格 -->
+    <section class="hyt-editorial-grid">
+        <article class="hyt-card hyt-card--accent-terracotta">
+            <span class="hyt-card-num">001</span>
+            <div class="hyt-card-body"><i data-lucide="feather" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Feather</div>
+                <div class="hyt-card-sub">Quill · Fine</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sage">
+            <span class="hyt-card-num">002</span>
+            <div class="hyt-card-body"><i data-lucide="palette" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Palette</div>
+                <div class="hyt-card-sub">Color · Paint</div>
+            </div>
+        </article>
+
+        <article class="hyt-card">
+            <span class="hyt-card-num">003</span>
+            <div class="hyt-card-body"><i data-lucide="brush" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Brush</div>
+                <div class="hyt-card-sub">Art · Tool</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sand">
+            <span class="hyt-card-num">004</span>
+            <div class="hyt-card-body"><i data-lucide="pen-tool" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Pen Tool</div>
+                <div class="hyt-card-sub">Vector · Curve</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-terracotta">
+            <span class="hyt-card-num">005</span>
+            <div class="hyt-card-body"><i data-lucide="compass" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Compass</div>
+                <div class="hyt-card-sub">Direction · Navigate</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sage">
+            <span class="hyt-card-num">006</span>
+            <div class="hyt-card-body"><i data-lucide="camera-retro" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Retro Camera</div>
+                <div class="hyt-card-sub">Photo · Film</div>
+            </div>
+        </article>
+
+        <article class="hyt-card">
+            <span class="hyt-card-num">007</span>
+            <div class="hyt-card-body"><i data-lucide="music" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Music</div>
+                <div class="hyt-card-sub">Audio · Note</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sand">
+            <span class="hyt-card-num">008</span>
+            <div class="hyt-card-body"><i data-lucide="film" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Film</div>
+                <div class="hyt-card-sub">Movie · Strip</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-terracotta">
+            <span class="hyt-card-num">009</span>
+            <div class="hyt-card-body"><i data-lucide="book-open" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Open Book</div>
+                <div class="hyt-card-sub">Read · Learn</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sage">
+            <span class="hyt-card-num">010</span>
+            <div class="hyt-card-body"><i data-lucide="crown" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Crown</div>
+                <div class="hyt-card-sub">Royal · Rank</div>
+            </div>
+        </article>
+
+        <article class="hyt-card">
+            <span class="hyt-card-num">011</span>
+            <div class="hyt-card-body"><i data-lucide="star" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Star</div>
+                <div class="hyt-card-sub">Favorite · Rank</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sand">
+            <span class="hyt-card-num">012</span>
+            <div class="hyt-card-body"><i data-lucide="heart" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Heart</div>
+                <div class="hyt-card-sub">Like · Love</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-terracotta">
+            <span class="hyt-card-num">013</span>
+            <div class="hyt-card-body"><i data-lucide="image" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Image</div>
+                <div class="hyt-card-sub">Picture · Media</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sage">
+            <span class="hyt-card-num">014</span>
+            <div class="hyt-card-body"><i data-lucide="message-circle" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Message</div>
+                <div class="hyt-card-sub">Comment · Chat</div>
+            </div>
+        </article>
+
+        <article class="hyt-card">
+            <span class="hyt-card-num">015</span>
+            <div class="hyt-card-body"><i data-lucide="mail" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Mail</div>
+                <div class="hyt-card-sub">Send · Letter</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sand">
+            <span class="hyt-card-num">016</span>
+            <div class="hyt-card-body"><i data-lucide="clock" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Clock</div>
+                <div class="hyt-card-sub">Time · Watch</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-terracotta">
+            <span class="hyt-card-num">017</span>
+            <div class="hyt-card-body"><i data-lucide="moon" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Moon</div>
+                <div class="hyt-card-sub">Dark · Night</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sage">
+            <span class="hyt-card-num">018</span>
+            <div class="hyt-card-body"><i data-lucide="sun" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Sun</div>
+                <div class="hyt-card-sub">Light · Day</div>
+            </div>
+        </article>
+
+        <article class="hyt-card">
+            <span class="hyt-card-num">019</span>
+            <div class="hyt-card-body"><i data-lucide="sparkles" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Sparkles</div>
+                <div class="hyt-card-sub">Magic · Shine</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sand">
+            <span class="hyt-card-num">020</span>
+            <div class="hyt-card-body"><i data-lucide="gem" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Gem</div>
+                <div class="hyt-card-sub">Jewel · Value</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-terracotta">
+            <span class="hyt-card-num">021</span>
+            <div class="hyt-card-body"><i data-lucide="coffee" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Coffee</div>
+                <div class="hyt-card-sub">Break · Cup</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sage">
+            <span class="hyt-card-num">022</span>
+            <div class="hyt-card-body"><i data-lucide="heart-handshake" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Handshake</div>
+                <div class="hyt-card-sub">Trust · Deal</div>
+            </div>
+        </article>
+
+        <article class="hyt-card">
+            <span class="hyt-card-num">023</span>
+            <div class="hyt-card-body"><i data-lucide="at-sign" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">At Sign</div>
+                <div class="hyt-card-sub">Email · Tag</div>
+            </div>
+        </article>
+
+        <article class="hyt-card hyt-card--accent-sand">
+            <span class="hyt-card-num">024</span>
+            <div class="hyt-card-body"><i data-lucide="hash" class="hyt-card-icon"></i></div>
+            <div>
+                <div class="hyt-card-caption">Hash</div>
+                <div class="hyt-card-sub">Tag · Note</div>
+            </div>
+        </article>
+    </section>
+
+    <!-- 编辑专栏 -->
+    <section class="hyt-editorial">
+        <div class="hyt-editorial-copy">
+            <h3>关于线条，<br>以及为什么选择 SVG。</h3>
+            <p>
+                Lucide 诞生于 Feather Icons 的一个分支，2022 年由 Paperplane 接手维护。
+                它保持了原始 24×24 网格与一致的 1.5px 笔画，同时扩充到超过一千八百枚图标。
+            </p>
+            <p>
+                与字体图标不同，SVG 以向量的方式嵌入 DOM，可以单独改变 <code>stroke</code>、
+                <code>stroke-width</code>，无需额外 CSS 变量，也不会有字体加载闪烁。
+            </p>
+        </div>
+        <div class="hyt-editorial-side">
+            <div><i data-lucide="trending-up"></i><span>Scale</span></div>
+            <div><i data-lucide="droplet"></i><span>Color</span></div>
+            <div><i data-lucide="sliders-horizontal"></i><span>Weight</span></div>
+            <div><i data-lucide="layers"></i><span>Group</span></div>
+            <div><i data-lucide="bolt"></i><span>Fast</span></div>
+            <div><i data-lucide="globe"></i><span>Open</span></div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="hyt-footer">
+        <span>侯雨彤 · Advanced Web Design</span>
+        <a href="index.html">← 返回目录</a>
+    </footer>
+
+    <!-- Lucide 初始化 -->
+    <script src="cdn/lucide/lucide.min.js"></script>
+    <script>
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="侯雨彤的《高级网页设计》课堂实践目录">
+    <title>侯雨彤｜高级网页设计课堂实践</title>
+    <style>
+        :root {
+            --ink: #294257;
+            --muted: #718394;
+            --paper: #eef7fb;
+            --white: #fffafd;
+            --teal: #72abc2;
+            --teal-dark: #668fae;
+            --coral: #e7a7b8;
+            --yellow: #f2cbd7;
+            --line: rgba(41, 66, 87, .14);
+            --shadow: 0 18px 45px rgba(77, 116, 139, .14);
+        }
+
+        * { box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            margin: 0;
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 8% 10%, rgba(242, 203, 215, .5) 0 9rem, transparent 9.1rem),
+                radial-gradient(circle at 94% 34%, rgba(114, 171, 194, .22) 0 12rem, transparent 12.1rem),
+                var(--paper);
+            font-family: "Trebuchet MS", "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+        }
+
+        a { color: inherit; }
+
+        .site-header {
+            position: relative;
+            overflow: hidden;
+            min-height: 470px;
+            padding: 24px clamp(24px, 6vw, 88px) 72px;
+            color: var(--white);
+            background: var(--teal-dark);
+        }
+
+        .site-header::after {
+            content: "";
+            position: absolute;
+            right: -7vw;
+            bottom: -12rem;
+            width: min(58vw, 720px);
+            height: 24rem;
+            border-radius: 50% 50% 0 0;
+            background: var(--coral);
+            transform: rotate(-8deg);
+            opacity: .9;
+        }
+
+        .topbar, .hero, .content { position: relative; z-index: 1; }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        .mark {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            letter-spacing: .08em;
+        }
+
+        .mark-symbol {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            border: 2px solid var(--yellow);
+            border-radius: 50%;
+            color: var(--yellow);
+            font-size: 18px;
+        }
+
+        .topbar a {
+            color: var(--white);
+            text-decoration: none;
+            opacity: .82;
+        }
+
+        .topbar a:hover { opacity: 1; color: var(--yellow); }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(240px, .8fr);
+            gap: 48px;
+            align-items: end;
+            max-width: 1180px;
+            margin: 96px auto 0;
+        }
+
+        .eyebrow {
+            margin: 0 0 14px;
+            color: var(--yellow);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: .18em;
+        }
+
+        h1, h2, h3, p { margin-top: 0; }
+
+        h1 {
+            max-width: 700px;
+            margin-bottom: 22px;
+            font-family: Georgia, "Microsoft YaHei", serif;
+            font-size: clamp(38px, 6vw, 76px);
+            font-weight: 400;
+            line-height: 1.08;
+            letter-spacing: .01em;
+        }
+
+        .hero-copy {
+            max-width: 590px;
+            margin-bottom: 0;
+            color: rgba(255, 253, 248, .78);
+            font-size: 17px;
+        }
+
+        .hero-note {
+            justify-self: end;
+            max-width: 270px;
+            padding: 22px;
+            border-left: 3px solid var(--yellow);
+            color: rgba(255, 253, 248, .9);
+            font-size: 14px;
+        }
+
+        .hero-note strong {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--yellow);
+            font-size: 25px;
+            font-family: Georgia, serif;
+        }
+
+        main { padding: 0 clamp(24px, 6vw, 88px) 70px; }
+
+        .content {
+            max-width: 1180px;
+            margin: 28px auto 0;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            align-items: end;
+            margin-bottom: 22px;
+        }
+
+        .section-heading h2 {
+            margin-bottom: 0;
+            font-family: Georgia, "Microsoft YaHei", serif;
+            font-size: 32px;
+            font-weight: 400;
+        }
+
+        .section-heading p { margin-bottom: 4px; color: var(--muted); }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .module-card {
+            display: flex;
+            min-height: 230px;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 26px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: var(--white);
+            box-shadow: var(--shadow);
+            text-decoration: none;
+            transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+        }
+
+        .module-card:hover, .module-card:focus-visible {
+            border-color: var(--teal);
+            box-shadow: 0 22px 48px rgba(27, 54, 67, .18);
+            transform: translateY(-6px);
+            outline: none;
+        }
+
+        .card-number {
+            color: var(--coral);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .14em;
+        }
+
+        .module-card h3 {
+            margin: 28px 0 8px;
+            font-size: 22px;
+        }
+
+        .module-card p { margin-bottom: 18px; color: var(--muted); font-size: 14px; }
+
+        .card-link {
+            color: var(--teal);
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .card-link::after { content: "  →"; font-size: 18px; }
+
+        .module-card.pending {
+            border-style: dashed;
+            background: rgba(255, 253, 248, .5);
+            box-shadow: none;
+        }
+
+        .pending .card-number, .pending .card-link { color: var(--muted); }
+
+        .brief {
+            display: grid;
+            grid-template-columns: .85fr 1.15fr;
+            gap: 28px;
+            margin-top: 62px;
+            padding: 30px;
+            border-top: 4px solid var(--yellow);
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .brief h2 { margin-bottom: 8px; font-family: Georgia, serif; font-size: 28px; font-weight: 400; }
+        .brief p { margin-bottom: 0; color: rgba(255, 253, 248, .78); font-size: 14px; }
+        .brief blockquote { margin: 0; padding-left: 22px; border-left: 1px solid rgba(255, 255, 255, .4); color: rgba(255, 253, 248, .9); font-size: 15px; }
+
+        footer {
+            max-width: 1180px;
+            margin: 38px auto 0;
+            padding-top: 18px;
+            border-top: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 760px) {
+            .site-header { min-height: 590px; }
+            .hero { grid-template-columns: 1fr; margin-top: 76px; }
+            .hero-note { justify-self: start; }
+            .module-grid, .brief { grid-template-columns: 1fr; }
+            .section-heading { display: block; }
+            .section-heading p { margin-top: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <nav class="topbar" aria-label="页面导航">
+            <a class="mark" href="index.html"><span class="mark-symbol">W</span><span>侯雨彤 / WEB LAB</span></a>
+            <a href="#directory">查看课堂目录</a>
+        </nav>
+
+        <div class="hero">
+            <div>
+                <p class="eyebrow">高级网页设计 · 课堂实践</p>
+                <h1>把页面做成<br>可以探索的作品。</h1>
+                <p class="hero-copy">这里记录侯雨彤在《高级网页设计》课程中的练习，从布局、图标到下一次实验，所有入口都在这一页集合。</p>
+            </div>
+            <div class="hero-note">
+                <strong>01 / 现在进行</strong>
+                事件传播、JavaScript 内置对象与函数综合练习已经加入目录，课堂实践会继续沿着学习进度更新。
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="content" id="directory">
+            <div class="section-heading">
+                <h2>课堂目录</h2>
+                <p>选择一个模块，开始查看练习页面。</p>
+            </div>
+
+            <section class="module-grid" aria-label="课堂网页目录">
+                <a class="module-card" href="1.html">
+                    <div>
+                        <span class="card-number">MODULE 01</span>
+                        <h3>Flex 复习</h3>
+                        <p>导航栏、三等分布局、响应式卡片与侧边栏的基础实践。</p>
+                    </div>
+                    <span class="card-link">进入练习</span>
+                </a>
+
+                <a class="module-card" href="font/demo_index.html">
+                    <div>
+                        <span class="card-number">MODULE 02</span>
+                        <h3>字体图标</h3>
+                        <p>查看 iconfont 项目中的 Unicode、Font class 与 Symbol 引用方式。</p>
+                    </div>
+                    <span class="card-link">查看图标</span>
+                </a>
+
+                <a class="module-card" href="svg005.html">
+                    <div>
+                        <span class="card-number">MODULE 03</span>
+                        <h3>SVG 图标</h3>
+                        <p>用 SVG symbol 组织图标，并通过标签页切换交互状态。</p>
+                    </div>
+                    <span class="card-link">打开页面</span>
+                </a>
+
+                <a class="module-card" href="dataType.html">
+                    <div>
+                        <span class="card-number">MODULE 04</span>
+                        <h3>数据类型与运算符</h3>
+                        <p>练习 JS 基本数据类型、类型判断、运算符与数据转换逻辑。</p>
+                    </div>
+                    <span class="card-link">查看练习</span>
+                </a>
+
+                <a class="module-card" href="function005.html">
+                    <div>
+                        <span class="card-number">MODULE 05</span>
+                        <h3>函数与猜数游戏</h3>
+                        <p>使用随机数、函数与循环完成限次数的猜数字小游戏。</p>
+                    </div>
+                    <span class="card-link">开始游戏</span>
+                </a>
+
+                <a class="module-card" href="JS_boj_apply.html">
+                    <div>
+                        <span class="card-number">MODULE 06</span>
+                        <h3>对象与个人明信片</h3>
+                        <p>通过对象属性和方法生成自我介绍，并体验年级升级逻辑。</p>
+                    </div>
+                    <span class="card-link">查看练习</span>
+                </a>
+
+                <a class="module-card" href="text.html">
+                    <div>
+                        <span class="card-number">MODULE 07</span>
+                        <h3>事件冒泡与捕获</h3>
+                        <p>通过嵌套元素观察事件传播，并练习页面点击事件。</p>
+                    </div>
+                    <span class="card-link">查看练习</span>
+                </a>
+
+                <a class="module-card" href="text1.html">
+                    <div>
+                        <span class="card-number">MODULE 08</span>
+                        <h3>JavaScript 内置对象</h3>
+                        <p>练习 Math、Date 与 Array 对象的常用属性和方法。</p>
+                    </div>
+                    <span class="card-link">查看练习</span>
+                </a>
+
+                <a class="module-card" href="function_apply.html">
+                    <div>
+                        <span class="card-number">MODULE 09</span>
+                        <h3>抓小球游戏</h3>
+                        <p>结合函数、事件监听与随机定位，完成抓小球计分练习。</p>
+                    </div>
+                    <span class="card-link">开始游戏</span>
+                </a>
+
+                <a class="module-card" href="iconfont-1.html">
+                    <div>
+                        <span class="card-number">MODULE 10</span>
+                        <h3>Font Awesome 字体图标</h3>
+                        <p>以字体文件方式载入 Font Awesome 6，展示 Solid、Regular 与 Brands 三种风格的精选图标。</p>
+                    </div>
+                    <span class="card-link">查看图标</span>
+                </a>
+
+                <a class="module-card" href="iconfont-2.html">
+                    <div>
+                        <span class="card-number">MODULE 11</span>
+                        <h3>Lucide SVG 图标</h3>
+                        <p>通过 lucide.min.js 以 SVG 方式嵌入 Lucide 图标，用可独立控制 stroke 的矢量线条呈现编辑纸感风格。</p>
+                    </div>
+                    <span class="card-link">查看图标</span>
+                </a>
+
+                <a class="module-card" href="iconfont-3.html">
+                    <div>
+                        <span class="card-number">MODULE 12</span>
+                        <h3>移动端底部导航 · 字体图标</h3>
+                        <p>基于 font/ 目录 iconfont.css，固定四 tab 自适应底部导航，含数字徽章与脉冲红点。</p>
+                    </div>
+                    <span class="card-link">打开页面</span>
+                </a>
+
+                <a class="module-card" href="iconfont-4.html">
+                    <div>
+                        <span class="card-number">MODULE 13</span>
+                        <h3>移动端底部导航 · SVG</h3>
+                        <p>基于 font/iconfont.js 的 Symbol 方式，同款四 tab 自适应底部导航，含数字徽章与脉冲红点。</p>
+                    </div>
+                    <span class="card-link">打开页面</span>
+                </a>
+            </section>
+
+            <section class="brief" aria-labelledby="brief-title">
+                <div>
+                    <h2 id="brief-title">本次页面需求</h2>
+                    <p>保留原始提示，作为本次课堂实践的制作记录。</p>
+                </div>
+                <blockquote>创建一个新页面，包括本目录下的所有网页的超链接，使用原生代码，不使用 CDN，新页面名称为 index.html，主题为侯雨彤的《高级网页设计》课堂实践，美化页面，课堂目录中包含 flex 复习、字体图标，其余模块后续在增加。页面中包括本提示</blockquote>
+            </section>
+
+            <footer>侯雨彤 · 高级网页设计课堂实践 · 本地静态页面目录</footer>
+        </div>
+    </main>
+</body>
+</html>
