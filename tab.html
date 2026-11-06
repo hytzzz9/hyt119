@@ -1,0 +1,168 @@
+<!--
+  作者：侯雨彤
+  建立时间：2026-11-04
+  使用大模型：Kimi-K3.1-Pro
+  功能名称：新闻 Tab 选项卡切换
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新闻选项卡</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+        'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .tab-container {
+      width: 90%;
+      max-width: 600px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    .tab-header {
+      display: flex;
+      border-bottom: 2px solid #eee;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 16px 12px;
+      border: none;
+      background: #fff;
+      font-size: 15px;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .tab-btn:hover {
+      color: #333;
+      background: #f8f9fa;
+    }
+
+    .tab-btn.active {
+      color: #e63946;
+      font-weight: 600;
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: #e63946;
+    }
+
+    .tab-content {
+      padding: 24px;
+    }
+
+    .tab-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    .tab-panel h3 {
+      font-size: 17px;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    .tab-panel ul {
+      list-style: none;
+    }
+
+    .tab-panel li {
+      padding: 10px 0;
+      border-bottom: 1px dashed #eee;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .tab-panel li:last-child {
+      border-bottom: none;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="tab-container">
+    <div class="tab-header">
+      <button class="tab-btn">国内新闻</button>
+      <button class="tab-btn">省内新闻</button>
+      <button class="tab-btn">国际新闻</button>
+      <button class="tab-btn">最热新闻</button>
+    </div>
+    <div class="tab-content">
+      <div class="tab-panel">
+        <h3>国内新闻</h3>
+        <ul>
+          <li>国内首条跨海高铁全线贯通，预计年底正式通车</li>
+          <li>全国多地启动冬季供暖保障工作</li>
+          <li>新版城市公共交通条例今日起施行</li>
+        </ul>
+      </div>
+      <div class="tab-panel">
+        <h3>省内新闻</h3>
+        <ul>
+          <li>我省前三季度 GDP 同比增长 5.8%</li>
+          <li>省级重点民生项目集中开工</li>
+          <li>省内高校新增 12 个国家级一流本科专业</li>
+        </ul>
+      </div>
+      <div class="tab-panel">
+        <h3>国际新闻</h3>
+        <ul>
+          <li>多国代表出席全球气候峰会，共商减排路径</li>
+          <li>国际油价小幅回落，市场观望情绪升温</li>
+          <li>世界人工智能大会发布最新技术报告</li>
+        </ul>
+      </div>
+      <div class="tab-panel">
+        <h3>最热新闻</h3>
+        <ul>
+          <li>年度热词榜单出炉，人工智能相关词汇居首</li>
+          <li>全民健身热潮持续，马拉松赛事报名火爆</li>
+          <li>国产大模型应用落地加速，引发广泛讨论</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/tab.js"></script>
+</body>
+</html>
