@@ -17,6 +17,7 @@ yarn-debug.log*
 # Trae / Agent local state
 .trae/
 .trae-cn/
+.trae-html-share-packages/
 
 # Local previews / temp
 *.local
