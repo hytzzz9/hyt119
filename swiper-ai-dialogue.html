@@ -1,0 +1,264 @@
+<!--
+  作者：侯雨彤
+  建立时间：2026-11-10
+  使用大模型：Kimi-K3.1-Pro
+  功能名称：Swiper 课堂任务提示词迭代与 AI 对话记录
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>提示词迭代记录 · 让 AI 听懂需求</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;background:#f6f8fc;color:#1f2937;line-height:1.9}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 20px 60px}
+
+  .head{background:linear-gradient(135deg,#0f2b5b,#1d5bbf);border-radius:20px;padding:34px 36px;color:#fff;margin-bottom:26px;box-shadow:0 12px 30px rgba(15,43,91,.28)}
+  .head .badge{display:inline-block;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);font-size:13px;letter-spacing:2px;margin-bottom:14px}
+  .head h1{font-size:28px;line-height:1.45}
+  .head h1 b{color:#ffd166}
+  .head p{margin-top:12px;font-size:14.5px;color:#d9e3f5}
+
+  .sec{background:#fff;border-radius:18px;padding:28px 30px;margin-bottom:24px;border:1px solid #e8ecf5;box-shadow:0 4px 14px rgba(31,41,55,.06)}
+  .sec h2{font-size:20px;margin-bottom:6px;color:#0f2b5b}
+  .sec h2 small{display:block;font-size:13px;font-weight:normal;color:#9ca3af;margin-top:4px}
+  .sec h3{font-size:15.5px;color:#1d4ed8;margin:22px 0 8px}
+  .sec p{font-size:14.5px;color:#374151;margin-bottom:10px}
+  .sec ul{margin:0 0 10px 20px;font-size:14.5px;color:#374151}
+  .sec li{margin-bottom:6px}
+
+  .round{display:inline-block;font-size:12.5px;letter-spacing:1px;border-radius:999px;padding:3px 12px;margin-bottom:10px}
+  .r1{background:#fee2e2;color:#b91c1c}
+  .r2{background:#dcfce7;color:#15803d}
+
+  .bubble{border-radius:14px;padding:16px 18px;margin-bottom:14px;font-size:14px;line-height:1.95}
+  .me{background:#eef4ff;border:1px solid #c7d8f8;color:#16305c}
+  .ai{background:#f7f8fa;border:1px solid #e5e7eb;color:#374151}
+  .bubble .who{display:block;font-size:12.5px;font-weight:700;letter-spacing:1px;margin-bottom:8px;opacity:.75}
+
+  pre{background:#0f1b2d;color:#dbe6f8;border-radius:12px;padding:16px 18px;overflow-x:auto;font-family:Consolas,"Courier New",monospace;font-size:13px;line-height:1.75;margin-bottom:12px}
+  pre .c{color:#7f9bc4}
+  code.inline{background:#eef2ff;color:#1d4ed8;padding:1px 7px;border-radius:5px;font-family:Consolas,monospace;font-size:13px}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+  th,td{border:1px solid #e5e7eb;padding:10px 12px;text-align:left;vertical-align:top}
+  th{background:#f3f6fc;color:#0f2b5b}
+  .ok{color:#15803d;font-weight:700}
+  .no{color:#b91c1c;font-weight:700}
+
+  .back{text-align:center;margin-top:28px}
+  .back a{display:inline-block;text-decoration:none;color:#0f2b5b;font-size:14.5px;font-weight:bold;background:#fff;border:1px solid #dbe4ff;border-radius:999px;padding:10px 26px;margin:0 6px;transition:transform .2s,box-shadow .2s}
+  .back a:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(15,43,91,.15)}
+
+  @media (max-width:700px){
+    .sec{padding:22px 18px}
+    table{font-size:13px}
+    th,td{padding:8px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <span class="badge">高 级 网 页 设 计 · A I 协 作 记 录</span>
+    <h1>提示词迭代与对话留档 · <b>让 AI 听懂需求</b></h1>
+    <p>本页记录三次课任务的提示词原文、AI 回答、我做的验证与修正，以及答辩问题的书面答复。</p>
+  </div>
+
+  <!-- 任务一 -->
+  <div class="sec">
+    <h2>任务一 · 提示词工程师<small>用两轮提示词让 AI 生成 #wySw4 的完整配置</small></h2>
+
+    <h3>需求拆解（写提示词前先列清单）</h3>
+    <table>
+      <tr><th>编号</th><th>需求</th><th>对应参数</th></tr>
+      <tr><td>①</td><td>无缝循环</td><td><code class="inline">loop: true</code></td></tr>
+      <tr><td>②</td><td>3.2 秒自动翻页，手动操作后不停止</td><td><code class="inline">autoplay: { delay: 3200, disableOnInteraction: false }</code></td></tr>
+      <tr><td>③</td><td>圆点分页器且可点击跳转</td><td><code class="inline">pagination: { el: '#wyPag4', clickable: true }</code></td></tr>
+      <tr><td>④</td><td>初始效果为 cube</td><td><code class="inline">effect: 'cube'</code></td></tr>
+    </table>
+
+    <h3>第 1 轮提示词</h3>
+    <span class="round r1">ROUND 1 · 需求描述较笼统</span>
+    <div class="bubble me">
+      <span class="who">我 → AI</span>
+      帮我用 Swiper 写一个轮播配置：要能循环，自动播放，带圆点，初始效果用立方体。
+    </div>
+    <div class="bubble ai">
+      <span class="who">AI 回答（第 1 轮）</span>
+      <pre>new Swiper('#wySw4', {
+  loop: true,
+  autoplay: true,
+  effect: 'cube',
+  pagination: { el: '#wyPag4' }
+});</pre>
+      这是一份最基础的配置，已经实现了循环、自动播放和立方体效果。
+    </div>
+
+    <h3>第 1 轮验证：逐项对照需求</h3>
+    <table>
+      <tr><th>需求</th><th>第 1 轮结果</th><th>判定</th></tr>
+      <tr><td>① 无缝循环</td><td>已写 <code class="inline">loop: true</code></td><td class="ok">通过</td></tr>
+      <tr><td>② 3.2 秒自动翻页</td><td>只写了 <code class="inline">autoplay: true</code>，使用默认 3 秒，且没有写 <code class="inline">disableOnInteraction: false</code></td><td class="no">不通过</td></tr>
+      <tr><td>③ 圆点可点击</td><td>缺少 <code class="inline">clickable: true</code>，圆点只能看不能点</td><td class="no">不通过</td></tr>
+      <tr><td>④ 初始效果 cube</td><td>已写 <code class="inline">effect: 'cube'</code>，但 <code class="inline">cubeEffect</code> 阴影参数缺失，观感偏平</td><td class="ok">基本通过</td></tr>
+    </table>
+    <p><b>结论：</b>第 1 轮 4 项需求里有 2 项不达标。原因是我的提示词只说了"要什么"，没有说清"具体数值"和"交互细节"，AI 只能用默认值填空。</p>
+
+    <h3>第 2 轮提示词（把模糊词换成具体参数）</h3>
+    <span class="round r2">ROUND 2 · 精确到数值与交互行为</span>
+    <div class="bubble me">
+      <span class="who">我 → AI</span>
+      请基于 Swiper 11 生成初始化 <code class="inline">#wySw4</code> 的完整配置，逐条满足：<br>
+      1）<code class="inline">loop: true</code> 无缝循环；<br>
+      2）<code class="inline">autoplay</code> 每张停留 <b>3200 毫秒</b>，并且用户手动滑动或点圆点之后<b>仍然继续自动播放</b>（即 disableOnInteraction 必须为 false）；<br>
+      3）分页器绑定 <code class="inline">#wyPag4</code>，且<b>圆点可点击跳转</b>（clickable: true）；<br>
+      4）初始效果固定为 <b>cube</b>，动画时长 800 毫秒，并给出 cubeEffect 的 shadow / shadowOffset / slideShadows 建议值；<br>
+      5）用一个函数封装，方便后续按不同 effect 重建实例。
+    </div>
+    <div class="bubble ai">
+      <span class="who">AI 回答（第 2 轮）</span>
+      <pre>function createSwiper4(fx) {
+  return new Swiper('#wySw4', {
+    loop: true,
+    effect: fx,
+    speed: 800,
+    autoplay: {
+      delay: 3200,
+      disableOnInteraction: false
+    },
+    pagination: {
+      el: '#wyPag4',
+      clickable: true
+    },
+    cubeEffect: {
+      shadow: true,
+      shadowOffset: 20,
+      shadowScale: 0.94,
+      slideShadows: true
+    }
+  });
+}
+
+var swiper4 = createSwiper4('cube');</pre>
+      把 effect 抽成参数后，切换效果时只需销毁旧实例再调用该函数即可。
+    </div>
+
+    <h3>第 2 轮验证结论</h3>
+    <p><b>一句话结论：</b>把"自动播放""圆点"这类模糊词替换成具体毫秒数、布尔值、元素 id 之后，第 2 轮配置 4 项需求全部达标，页面中 <code class="inline">#wySw4</code> 初始即为可自动翻页的立方体轮播。</p>
+    <ul>
+      <li>loop 循环：最后一张继续往后翻会回到第一张 <span class="ok">✓</span></li>
+      <li>自动播放 3.2 秒：静止 3.2 秒后自动切换 <span class="ok">✓</span></li>
+      <li>手动拖拽后仍在继续自动播放 <span class="ok">✓</span></li>
+      <li>点击圆点可直接跳转到对应展品 <span class="ok">✓</span></li>
+    </ul>
+
+    <h3>答辩：第 2 轮是怎么"说清楚"的</h3>
+    <p>第一版提示词漏掉的是<b>"手动操作后是否继续自动播放"</b>和<b>"圆点是否可点击"</b>这两个交互细节，以及自动播放的<b>具体时长</b>。第二轮我没有写更多形容词，而是把每条需求翻译成"参数名 + 具体值 + 期望行为"三件套：</p>
+    <ul>
+      <li>"自动播放" → <code class="inline">delay: 3200</code> + <code class="inline">disableOnInteraction: false</code></li>
+      <li>"带圆点" → <code class="inline">el: '#wyPag4'</code> + <code class="inline">clickable: true</code></li>
+      <li>"立方体" → <code class="inline">effect: 'cube'</code> + 补充 cubeEffect 的阴影参数</li>
+    </ul>
+    <p>AI 第一次给的代码错在：把 <code class="inline">autoplay</code> 直接写成布尔值 <code class="inline">true</code>，只能吃默认 3 秒，且默认在用户交互后停止；<code class="inline">pagination</code> 只传了 el，没写 <code class="inline">clickable</code>，圆点变成纯展示。</p>
+  </div>
+
+  <!-- 任务二 -->
+  <div class="sec">
+    <h2>任务二 · creative 仿写<small>课堂未讲的第 7 种 effect：creative 电影墙</small></h2>
+
+    <h3>官方示例阅读</h3>
+    <p>对照 <code class="inline">swiper/demo/257-effect-creative.html</code>，第 3 个示例最接近"电影胶片墙"：上一张略微后退并左移，下一张从右侧推进。据此我改写成上一张缩小左移带角度、下一张放大右移进场。</p>
+
+    <div class="bubble ai">
+      <span class="who">最终代码（已写入 swiper-task.html）</span>
+      <pre>config.creativeEffect = {
+  prev: {
+    shadow: true,
+    translate: ['-58%', 0, -320],
+    rotate: [0, 0, -10],
+    scale: 0.78,
+    opacity: 0.6
+  },
+  next: {
+    shadow: true,
+    translate: ['58%', 0, -160],
+    rotate: [0, 0, 10],
+    scale: 1.08,
+    opacity: 0.9
+  }
+};</pre>
+    </div>
+
+    <h3>用自己的话回答：prev / next 的 transform 各控制什么</h3>
+    <table>
+      <tr><th>字段</th><th>含义</th></tr>
+      <tr><td><code class="inline">prev</code></td><td>描述<b>当前张左边那一张</b>的姿态。translate 的 z 轴负值把它推到观众更远处（缩小、后退），rotate 给一点倾斜角，scale 再压小，整体形成"被翻过去的旧胶片"。</td></tr>
+      <tr><td><code class="inline">next</code></td><td>描述<b>当前张右边那一张</b>的姿态。translate 的 x 轴正值把它放在右侧，z 轴负值稍小所以比 prev 更大，scale 略大于 1，看起来像是正被推进画面。</td></tr>
+      <tr><td><code class="inline">translate</code></td><td>数组三个值依次为 x、y、z 轴位移，<b>理解方式与 CSS transform: translate3d 一致</b>。</td></tr>
+      <tr><td><code class="inline">rotate / scale / opacity / shadow / origin</code></td><td>分别控制旋转角度、缩放比例、透明度、阴影开关、变换原点。</td></tr>
+    </table>
+
+    <h3>答辩：百分号是相对谁的</h3>
+    <p>translate 中的百分比是<b>相对该 slide 自身尺寸</b>（更准确说是相对容器尺寸）计算的，不是相对视口：<code class="inline">['58%', 0, -160]</code> 表示沿 x 轴移动约半张多卡片宽度，<code class="inline">-160</code> 是不带单位的像素值，直接沿 z 轴后退 160px。</p>
+    <p><b>改数值实验：</b>把 <code class="inline">next.rotate</code> 从 <code class="inline">[0, 0, 10]</code> 改成 <code class="inline">[0, 0, 20]</code>，下一张卡片的倾斜角立刻变大，卡片右下角会明显下压，胶片墙的"歪斜感"更强。</p>
+  </div>
+
+  <!-- 任务三 -->
+  <div class="sec">
+    <h2>任务三 · 综合创作<small>第六件展品 + 超纲能力</small></h2>
+
+    <h3>① 第六件展品：爱达·魔都号</h3>
+    <p>首艘国产大型邮轮，2024 年 1 月商业首航。展品图由 AI 生成（横版 16:9），slide 结构与其他五件展品完全一致：</p>
+    <pre>&lt;div class="swiper-slide"&gt;
+  &lt;img src="swiper-imgs/aida_modu_1.jpg" alt="爱达·魔都号邮轮"&gt;
+  &lt;div class="wy-cap"&gt;
+    &lt;h3&gt;爱达·魔都号&lt;/h3&gt;
+    &lt;p&gt;首艘国产大型邮轮 · 2024 年 1 月商业首航&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+
+    <h3>② 超纲能力：keyboard 键盘控制</h3>
+    <p>我选的是 <b>keyboard 键盘控制</b>——课堂上只讲了拖动、圆点和自动播放，键盘切换没有讲。开启后把焦点放在轮播上，按 ← / → 方向键即可切换展品。</p>
+    <pre>keyboard: {
+  enabled: true,        <span class="c">// 开启键盘控制</span>
+  onlyInViewport: true  <span class="c">// 只有当轮播在可视区域内才响应，避免和页面滚动打架</span>
+}</pre>
+
+    <h3>与 AI 的关键往返</h3>
+    <div class="bubble me">
+      <span class="who">我 → AI</span>
+      Swiper 里怎么让轮播支持键盘左右键切换？有没有什么坑？
+    </div>
+    <div class="bubble ai">
+      <span class="who">AI 回答</span>
+      用 <code class="inline">keyboard: { enabled: true }</code> 即可。注意默认页面上下方向键也会被拦截，长页面滚动会受影响，建议加 <code class="inline">onlyInViewport: true</code>，只让当前可见的轮播响应。
+    </div>
+    <div class="bubble me">
+      <span class="who">我 → AI（追问）</span>
+      那如果我给它加 <code class="inline">onlyInViewport: true</code>，页面同时有 4 个轮播时会不会互相抢按键？
+    </div>
+    <div class="bubble ai">
+      <span class="who">AI 回答</span>
+      不会。每个实例只在自己的容器进入视口时监听，同一时刻视口内通常只有一个轮播处于激活状态。
+    </div>
+
+    <h3>答辩四连问</h3>
+    <ul>
+      <li><b>这段代码什么意思？</b><code class="inline">keyboard.enabled</code> 开启方向键导航，<code class="inline">onlyInViewport</code> 限制仅可见时生效。</li>
+      <li><b>AI 第一次给的东西不对，你改了什么？</b>AI 只给了 <code class="inline">keyboard: { enabled: true }</code>，实测上下方向键会抢走页面滚动，所以补了 <code class="inline">onlyInViewport: true</code>。</li>
+      <li><b>新参数的作用？</b>避免多个轮播同时监听键盘事件、避免影响页面正常滚动。</li>
+      <li><b>把 delay 改成指定值并解释预期变化？</b>把 <code class="inline">autoplay.delay</code> 从 3200 改成 1500，每张展品停留时间缩短到 1.5 秒，翻页节奏明显变快；改成 6000 则变成缓慢浏览、适合细看展品说明。</li>
+    </ul>
+  </div>
+
+  <div class="back">
+    <a href="swiper-task.html">← 返回 Swiper 任务页</a>
+    <a href="index.html">返回课堂实践中心</a>
+  </div>
+</div>
+</body>
+</html>
