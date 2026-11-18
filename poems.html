@@ -1,0 +1,173 @@
+<!--
+  作者：侯雨彤
+  建立时间：2026-11-13
+  使用大模型：DeepSeek-V4.1-Flash
+  功能名称：通过本地 Express 接口读取 db/db.json 中的诗词，并以"上图下文"卡片渲染
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>诗词卡片 · fetch 读取本地数据</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f4f5f7;
+            color: #222;
+            padding: 36px 20px 60px;
+        }
+
+        .hyt_wrap {
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        .hyt_head {
+            margin-bottom: 28px;
+            text-align: center;
+        }
+
+        .hyt_head h1 {
+            font-size: 28px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .hyt_head p {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .hyt_head code {
+            background: #e8eaee;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .hyt_list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            list-style: none;
+        }
+
+        /* 上图下文：图片在上，文字在下 */
+        .hyt_card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+
+        .hyt_card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .hyt_card_img {
+            display: block;
+            width: 100%;
+            height: 170px;
+            object-fit: cover;
+        }
+
+        .hyt_card_body {
+            padding: 16px 18px 20px;
+        }
+
+        .hyt_card_title {
+            font-size: 17px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .hyt_card_text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #666;
+        }
+
+        .hyt_tip {
+            text-align: center;
+            color: #c0392b;
+            font-size: 14px;
+            padding: 40px 0;
+        }
+
+        .hyt_back {
+            margin-top: 36px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .hyt_back a {
+            color: #2f6fed;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="hyt_wrap">
+        <header class="hyt_head">
+            <h1>诗词卡片</h1>
+            <p>数据来源：<code>db/db.json</code> → 接口 <code>http://localhost:3004/api/poems</code> → fetch</p>
+        </header>
+
+        <ul class="hyt_list" id="hyt_poemList">
+            <li class="hyt_tip">正在加载数据…</li>
+        </ul>
+
+        <div class="hyt_back"><a href="index.html">← 返回课堂实践中心</a></div>
+    </div>
+
+    <script>
+        /**
+         * 函数功能描述：向本地服务器请求诗词数组，成功后交给渲染函数处理，失败则给出提示。
+         */
+        function hyt_loadPoems() {
+            fetch('http://localhost:3004/api/poems')
+                .then(function (hyt_res) {
+                    // 第一次拿到的是"响应"，还要再解析一次
+                    return hyt_res.json();
+                })
+                .then(function (hyt_poems) {
+                    // 这里才是真正的数组
+                    hyt_renderPoems(hyt_poems);
+                })
+                .catch(function () {
+                    // 服务器没启动时不白屏，给出可操作的提示
+                    document.getElementById('hyt_poemList').innerHTML =
+                        '<li class="hyt_tip">数据获取失败！请先在 db 文件夹运行 node server.js（端口 3004）</li>';
+                });
+        }
+
+        /**
+         * 函数功能描述：遍历诗词数组，拼出"上图下文"卡片并写入列表容器。
+         * @param {Array} hyt_poems - 接口返回的诗词对象数组
+         */
+        function hyt_renderPoems(hyt_poems) {
+            var hyt_html = '';
+            for (var hyt_i = 0; hyt_i < hyt_poems.length; hyt_i++) {
+                hyt_html += '<li class="hyt_card">'
+                    + '<img class="hyt_card_img" src="' + hyt_poems[hyt_i].pic + '" alt="' + hyt_poems[hyt_i].title + '">'
+                    + '<div class="hyt_card_body">'
+                    + '<h2 class="hyt_card_title">' + hyt_poems[hyt_i].title + '</h2>'
+                    + '<p class="hyt_card_text">' + hyt_poems[hyt_i].content + '</p>'
+                    + '</div></li>';
+            }
+            document.getElementById('hyt_poemList').innerHTML = hyt_html;
+        }
+
+        hyt_loadPoems();
+    </script>
+</body>
+</html>

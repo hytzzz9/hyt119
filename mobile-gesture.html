@@ -1,0 +1,288 @@
+<!--
+  作者：侯雨彤
+  建立时间：2026-11-18
+  使用大模型：DeepSeek-V4.1-Flash
+  功能名称：任务二·手势卡片：左右滑动切换 4 道中华美食，含阈值、边界提示与 300ms 冷却
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中华美食卡片 · 左右滑动切换</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: system-ui, -apple-system, "Microsoft YaHei", sans-serif;
+            background: #f6f5f2;
+            color: #23201c;
+            padding: 22px 16px 48px;
+            -webkit-touch-callout: none;
+        }
+
+        .hyt_wrap { max-width: 620px; margin: 0 auto; }
+
+        .hyt_head { margin-bottom: 18px; }
+        .hyt_head h1 { font-size: 21px; margin-bottom: 6px; }
+        .hyt_head p { font-size: 13px; color: #7a736a; }
+
+        /* 视口：只接管横向手势，纵向仍然可以滚动页面 */
+        .hyt_viewport {
+            overflow: hidden;
+            border-radius: 18px;
+            touch-action: pan-y;
+            user-select: none;
+            -webkit-user-select: none;
+            box-shadow: 0 10px 30px rgba(60, 40, 20, .15);
+        }
+
+        .hyt_track {
+            display: flex;
+            transition: transform .3s ease;
+            will-change: transform;
+        }
+
+        .hyt_card {
+            flex: 0 0 100%;
+            min-height: 330px;
+            padding: 26px 24px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #fff;
+            position: relative;
+        }
+
+        .hyt_card_no {
+            font-size: 13px;
+            letter-spacing: 2px;
+            opacity: .8;
+            font-weight: 600;
+        }
+
+        .hyt_card_name {
+            font-size: 34px;
+            line-height: 1.25;
+            margin: 10px 0 14px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, .18);
+        }
+
+        .hyt_card_desc {
+            font-size: 14.5px;
+            line-height: 1.9;
+            opacity: .95;
+            max-width: 92%;
+        }
+
+        .hyt_card_tag {
+            display: inline-block;
+            margin-top: 18px;
+            font-size: 12.5px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .22);
+            backdrop-filter: blur(4px);
+        }
+
+        .hyt_meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 14px;
+            font-size: 13px;
+            color: #6b6459;
+        }
+
+        .hyt_counter { font-weight: 600; }
+
+        .hyt_hint {
+            min-height: 22px;
+            margin-top: 10px;
+            text-align: center;
+            font-size: 13.5px;
+            color: #b4441f;
+            opacity: 0;
+            transition: opacity .25s;
+        }
+
+        .hyt_hint.show { opacity: 1; }
+
+        .hyt_tips {
+            background: #fff;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-top: 18px;
+            font-size: 13px;
+            color: #5b5349;
+            line-height: 1.9;
+        }
+
+        .hyt_tips h2 { font-size: 14.5px; margin-bottom: 6px; color: #23201c; }
+
+        .hyt_back { text-align: center; font-size: 13px; margin-top: 18px; }
+        .hyt_back a { color: #2563eb; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="hyt_wrap">
+        <header class="hyt_head">
+            <h1>中华美食卡片</h1>
+            <p>左右滑动切换上一道 / 下一道，阈值 40px，切换 0.3s 过渡，连滑冷却 300ms。</p>
+        </header>
+
+        <div class="hyt_viewport" id="hyt_viewport">
+            <div class="hyt_track" id="hyt_track"></div>
+        </div>
+
+        <div class="hyt_meta">
+            <span class="hyt_counter" id="hyt_counter">第 1/4 张</span>
+            <span>← 右滑上一道　左滑下一道 →</span>
+        </div>
+
+        <div class="hyt_hint" id="hyt_hint"></div>
+
+        <section class="hyt_tips">
+            <h2>这一版怎么做的</h2>
+            ① <b>阈值</b>：横向位移不足 40px 视为误触，不切换；<br>
+            ② <b>冷却</b>：每次切换后锁定 300ms，快速连滑也只走一张；<br>
+            ③ <b>不误滚动</b>：容器 <code>touch-action: pan-y</code>，横向手势归代码管，纵向仍可滚动页面；<br>
+            ④ <b>拿坐标</b>：抬手时用 <code>changedTouches[0]</code>，因为此时 <code>touches</code> 已经为空。
+        </section>
+
+        <div class="hyt_back"><a href="index.html">← 返回课堂实践中心</a></div>
+    </div>
+
+    <script>
+        // 4 道菜：菜名、简介、标签、渐变背景
+        var hyt_dishes = [
+            {
+                name: '北京烤鸭',
+                desc: '枣红酥脆的鸭皮片成薄片，卷上荷叶饼、葱丝与甜面酱，一口下去先响后香。',
+                tag: '京菜 · 烤制',
+                bg: 'linear-gradient(140deg, #f0a35e 0%, #b4471b 100%)'
+            },
+            {
+                name: '麻婆豆腐',
+                desc: '豆瓣酱与花椒在锅里翻滚，豆腐颤而不碎，麻、辣、烫、香、酥、嫩六字俱全。',
+                tag: '川菜 · 麻辣',
+                bg: 'linear-gradient(140deg, #e15a5f 0%, #8c1c2c 100%)'
+            },
+            {
+                name: '白切鸡',
+                desc: '清汤浸熟后过冰水，皮爽肉滑，蘸一碟姜葱油，把鸡肉本身的鲜甜全提了出来。',
+                tag: '粤菜 · 白灼',
+                bg: 'linear-gradient(140deg, #8fc47a 0%, #2f6b45 100%)'
+            },
+            {
+                name: '肉夹馍',
+                desc: '白吉馍烤到外酥里软，剁碎的腊汁肉夹进去，肉汁浸透馍瓤，配一瓶冰峰最地道。',
+                tag: '陕菜 · 小吃',
+                bg: 'linear-gradient(140deg, #f5bf4a 0%, #a15a10 100%)'
+            }
+        ];
+
+        var hyt_viewport = document.getElementById('hyt_viewport');
+        var hyt_track = document.getElementById('hyt_track');
+        var hyt_counter = document.getElementById('hyt_counter');
+        var hyt_hintEl = document.getElementById('hyt_hint');
+
+        var hyt_index = 0;             // 当前卡片下标
+        var hyt_startX = 0;            // 手指起点 X
+        var hyt_startY = 0;            // 手指起点 Y
+        var hyt_lockUntil = 0;         // 冷却结束时刻，防止连滑跳两张
+        var hyt_hintTimer = null;
+        var hyt_threshold = 40;        // 切换阈值（像素）
+
+        /**
+         * 函数功能描述：根据菜品数据生成 4 张卡片，并插入滑动轨道。
+         */
+        function hyt_buildCards() {
+            var hyt_html = '';
+            for (var hyt_i = 0; hyt_i < hyt_dishes.length; hyt_i++) {
+                hyt_html += '<article class="hyt_card" style="background:' + hyt_dishes[hyt_i].bg + '">'
+                    + '<div>'
+                    + '<div class="hyt_card_no">NO.' + (hyt_i + 1 < 10 ? '0' : '') + (hyt_i + 1) + ' / 0' + hyt_dishes.length + '</div>'
+                    + '<h2 class="hyt_card_name">' + hyt_dishes[hyt_i].name + '</h2>'
+                    + '<p class="hyt_card_desc">' + hyt_dishes[hyt_i].desc + '</p>'
+                    + '<span class="hyt_card_tag">' + hyt_dishes[hyt_i].tag + '</span>'
+                    + '</div>'
+                    + '</article>';
+            }
+            hyt_track.innerHTML = hyt_html;
+        }
+
+        /**
+         * 函数功能描述：把滑动轨道整体左移到指定卡片，并同步更新"第 x/4 张"。
+         * @param {number} hyt_target - 目标卡片下标
+         */
+        function hyt_goTo(hyt_target) {
+            hyt_index = hyt_target;
+            hyt_track.style.transform = 'translateX(' + (-hyt_target * 100) + '%)';
+            hyt_counter.textContent = '第 ' + (hyt_target + 1) + '/' + hyt_dishes.length + ' 张';
+        }
+
+        /**
+         * 函数功能描述：在提示行显示一条短提示，1.2 秒后自动淡出。
+         * @param {string} hyt_msg - 提示文案
+         */
+        function hyt_showHint(hyt_msg) {
+            hyt_hintEl.textContent = hyt_msg;
+            hyt_hintEl.classList.add('show');
+            clearTimeout(hyt_hintTimer);
+            hyt_hintTimer = setTimeout(function () {
+                hyt_hintEl.classList.remove('show');
+            }, 1200);
+        }
+
+        /**
+         * 函数功能描述：记录手指起点，供抬手时计算横向位移。
+         * @param {TouchEvent} hyt_e - 触摸事件
+         */
+        function hyt_onStart(hyt_e) {
+            hyt_startX = hyt_e.touches[0].clientX;
+            hyt_startY = hyt_e.touches[0].clientY;
+        }
+
+        /**
+         * 函数功能描述：抬手时计算横向位移，超过阈值就切换卡片，并在边界给出提示。
+         * @param {TouchEvent} hyt_e - 触摸事件
+         */
+        function hyt_onEnd(hyt_e) {
+            if (Date.now() < hyt_lockUntil) { return; }   // 冷却中，直接忽略
+
+            // 抬手时 touches 已清空，只能从 changedTouches 取坐标
+            var hyt_dx = hyt_e.changedTouches[0].clientX - hyt_startX;
+            var hyt_dy = hyt_e.changedTouches[0].clientY - hyt_startY;
+
+            if (Math.abs(hyt_dx) < hyt_threshold) { return; }        // 短距离误触
+            if (Math.abs(hyt_dx) < Math.abs(hyt_dy)) { return; }     // 更偏纵向，交给页面滚动
+
+            if (hyt_dx < 0) {
+                if (hyt_index === hyt_dishes.length - 1) {
+                    hyt_showHint('已经是最后一张了');
+                    return;
+                }
+                hyt_goTo(hyt_index + 1);
+            } else {
+                if (hyt_index === 0) {
+                    hyt_showHint('已经是第一张了');
+                    return;
+                }
+                hyt_goTo(hyt_index - 1);
+            }
+
+            hyt_lockUntil = Date.now() + 300;   // 冷却 300ms，防止一次快滑跳两张
+        }
+
+        hyt_buildCards();
+        hyt_goTo(0);
+
+        hyt_viewport.addEventListener('touchstart', hyt_onStart, { passive: true });
+        hyt_viewport.addEventListener('touchend', hyt_onEnd, { passive: true });
+        hyt_viewport.addEventListener('touchcancel', function () {
+            hyt_lockUntil = 0;   // 被打断时清掉冷却状态，避免下次滑不动
+        }, { passive: true });
+    </script>
+</body>
+</html>

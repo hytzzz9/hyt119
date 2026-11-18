@@ -1,0 +1,566 @@
+<!--
+  作者：侯雨彤
+  建立时间：2026-11-18
+  使用大模型：DeepSeek-V4.1-Flash
+  功能名称：任务四·传感器互动（双方案合一）：摇一摇抽菜谱 + 倾斜视差，含阈值冷却、iOS 授权、无传感器降级
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>传感器互动 · 摇一摇 + 倾斜视差</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: system-ui, -apple-system, "Microsoft YaHei", sans-serif;
+            background: linear-gradient(180deg, #fff7ed 0%, #f6f2ec 48%, #f1eee9 100%);
+            color: #2a2118;
+            padding: 24px 16px 44px;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .hyt_wrap { max-width: 560px; margin: 0 auto; }
+
+        .hyt_head h1 { font-size: 22px; margin-bottom: 8px; }
+        .hyt_head p { font-size: 13px; color: #8a7a66; line-height: 1.8; }
+
+        /* 两个方案的切换条 */
+        .hyt_tabs {
+            display: flex;
+            gap: 8px;
+            margin: 18px 0 16px;
+            background: #fff;
+            padding: 6px;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(120, 80, 40, .1);
+        }
+
+        .hyt_tab {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #8a7a66;
+            font-size: 14px;
+        }
+
+        .hyt_tab.hyt_on { background: #2a2118; color: #fff; }
+
+        .hyt_pane { display: none; }
+        .hyt_pane.hyt_on { display: block; }
+
+        /* ---------- 方案 A：摇一摇 ---------- */
+        .hyt_shakeIcon {
+            margin: 12px auto 16px;
+            width: 84px;
+            height: 84px;
+            border-radius: 24px;
+            background: linear-gradient(140deg, #ffb066, #e2641f);
+            color: #fff;
+            font-size: 38px;
+            line-height: 84px;
+            box-shadow: 0 10px 24px rgba(200, 90, 20, .28);
+            animation: hyt_shakeIt 2.2s ease-in-out infinite;
+        }
+
+        @keyframes hyt_shakeIt {
+            0%, 62%, 100% { transform: rotate(0deg); }
+            68% { transform: rotate(-12deg); }
+            74% { transform: rotate(10deg); }
+            80% { transform: rotate(-8deg); }
+            86% { transform: rotate(6deg); }
+            92% { transform: rotate(-3deg); }
+        }
+
+        .hyt_card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px 22px;
+            box-shadow: 0 10px 30px rgba(120, 80, 40, .13);
+            min-height: 148px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hyt_label { font-size: 12px; color: #a08e77; letter-spacing: 2px; margin-bottom: 10px; }
+
+        .hyt_dish { font-size: 30px; font-weight: 700; color: #b4471b; letter-spacing: 1px; }
+
+        .hyt_dish_tip { font-size: 13px; color: #8a7a66; margin-top: 10px; }
+
+        .hyt_pop { animation: hyt_popIt .38s cubic-bezier(.2, 1.4, .5, 1); }
+
+        @keyframes hyt_popIt {
+            0% { transform: scale(.6); opacity: .2; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .hyt_status { margin-top: 12px; font-size: 12.5px; color: #8a7a66; min-height: 20px; }
+
+        .hyt_btn {
+            margin-top: 14px;
+            padding: 12px 18px;
+            border-radius: 11px;
+            border: 1px solid #e3d9cc;
+            background: #fff;
+            color: #2a2118;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .hyt_btn:active { opacity: .85; }
+
+        .hyt_btn_main {
+            background: #2a2118;
+            color: #fff;
+            border-color: #2a2118;
+        }
+
+        /* ---------- 方案 B：倾斜视差 ---------- */
+        .hyt_scene {
+            position: relative;
+            height: 46vh;
+            min-height: 280px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #081428 0%, #14284a 58%, #091423 100%);
+            box-shadow: 0 14px 34px rgba(0, 0, 0, .35);
+            text-align: left;
+        }
+
+        .hyt_layer {
+            position: absolute;
+            inset: -40px;
+            will-change: transform;
+            pointer-events: none;
+        }
+
+        .hyt_stars {
+            background-image:
+                radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
+                radial-gradient(1.5px 1.5px at 78% 12%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 34% 42%, #cfe0ff 50%, transparent 51%),
+                radial-gradient(1px 1px at 62% 30%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 88% 52%, #cfe0ff 50%, transparent 51%),
+                radial-gradient(1px 1px at 22% 66%, #fff 50%, transparent 51%),
+                radial-gradient(1px 1px at 48% 76%, #cfe0ff 50%, transparent 51%);
+        }
+
+        .hyt_haze {
+            background:
+                radial-gradient(closest-side, rgba(255, 196, 92, .55), rgba(255, 196, 92, 0) 70%) 50% 68% / 46% 46% no-repeat,
+                radial-gradient(closest-side, rgba(90, 150, 255, .32), rgba(90, 150, 255, 0) 70%) 22% 30% / 60% 60% no-repeat;
+        }
+
+        .hyt_mount_back {
+            background: linear-gradient(180deg, #16386b, #0d2247);
+            clip-path: polygon(0 100%, 0 62%, 18% 44%, 34% 60%, 52% 36%, 70% 58%, 86% 46%, 100% 62%, 100% 100%);
+        }
+
+        .hyt_mount_front {
+            background: linear-gradient(180deg, #0b1b34, #060f1e);
+            clip-path: polygon(0 100%, 0 76%, 14% 64%, 30% 78%, 48% 58%, 66% 76%, 82% 66%, 100% 78%, 100% 100%);
+        }
+
+        .hyt_title_layer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            inset: 0;
+        }
+
+        .hyt_title { font-size: 26px; letter-spacing: 6px; font-weight: 700; color: #fff; text-shadow: 0 6px 24px rgba(0, 0, 0, .6); }
+        .hyt_subtitle { margin-top: 8px; font-size: 11.5px; letter-spacing: 3px; color: #b9c9e2; }
+
+        .hyt_chips { inset: 0; }
+
+        .hyt_chip {
+            position: absolute;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 12.5px;
+            letter-spacing: 1px;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .28);
+            backdrop-filter: blur(6px);
+            color: #eaf1ff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
+        }
+
+        .hyt_chip_a { left: 10%; top: 24%; }
+        .hyt_chip_b { right: 8%; top: 40%; }
+        .hyt_chip_c { left: 18%; bottom: 22%; }
+
+        .hyt_hud {
+            position: absolute;
+            left: 10px;
+            bottom: 10px;
+            font-size: 11px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, .5);
+            color: #cfe0ff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* ---------- 说明 ---------- */
+        .hyt_notes {
+            text-align: left;
+            margin-top: 22px;
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px 18px;
+            font-size: 13px;
+            line-height: 1.9;
+            color: #5b5044;
+            box-shadow: 0 6px 18px rgba(120, 80, 40, .08);
+        }
+
+        .hyt_notes h2 { font-size: 14px; color: #2a2118; margin-bottom: 6px; }
+        .hyt_notes h2 + p { margin-bottom: 14px; }
+        .hyt_notes code { background: #f1ece4; padding: 1px 5px; border-radius: 4px; }
+
+        .hyt_back { font-size: 13px; margin-top: 20px; }
+        .hyt_back a { color: #b4471b; text-decoration: none; }
+
+        .hyt_hide { display: none; }
+    </style>
+</head>
+<body>
+    <div class="hyt_wrap">
+        <header class="hyt_head">
+            <h1>传感器互动 · 两个方案</h1>
+            <p>需要真机 · 方案 A 阈值 18 且冷却 1.5s · 方案 B 按倾斜角度错位移动</p>
+        </header>
+
+        <div class="hyt_tabs">
+            <button class="hyt_tab hyt_on" id="hyt_tabShake" type="button">A 摇一摇</button>
+            <button class="hyt_tab" id="hyt_tabTilt" type="button">B 倾斜视差</button>
+        </div>
+
+        <!-- 方案 A -->
+        <div class="hyt_pane hyt_on" id="hyt_paneShake">
+            <div class="hyt_shakeIcon">🍽</div>
+
+            <div class="hyt_card">
+                <div class="hyt_label">今 日 菜 谱</div>
+                <div class="hyt_dish" id="hyt_dish">摇一摇见分晓</div>
+                <div class="hyt_dish_tip" id="hyt_dishTip">用力摇一下手机试试</div>
+            </div>
+
+            <div class="hyt_status" id="hyt_shakeStatus">正在检测加速度传感器…</div>
+
+            <button class="hyt_btn" id="hyt_fallbackBtn" type="button">点我抽一次（无传感器时可用）</button>
+        </div>
+
+        <!-- 方案 B -->
+        <div class="hyt_pane" id="hyt_paneTilt">
+            <div class="hyt_scene" id="hyt_scene">
+                <div class="hyt_layer hyt_stars" data-depth="3"></div>
+                <div class="hyt_layer hyt_haze" data-depth="8"></div>
+                <div class="hyt_layer hyt_mount_back" data-depth="14"></div>
+                <div class="hyt_layer hyt_mount_front" data-depth="22"></div>
+                <div class="hyt_layer hyt_title_layer" data-depth="6">
+                    <div class="hyt_title">倾斜视差</div>
+                    <div class="hyt_subtitle">T I L T · P A R A L L A X</div>
+                </div>
+                <div class="hyt_layer hyt_chips" data-depth="46">
+                    <span class="hyt_chip hyt_chip_a">大国重器</span>
+                    <span class="hyt_chip hyt_chip_b">光影展</span>
+                    <span class="hyt_chip hyt_chip_c">触手可及</span>
+                </div>
+                <div class="hyt_hud" id="hyt_hud">γ 0.0° / β 0.0°</div>
+            </div>
+
+            <div class="hyt_status" id="hyt_tiltStatus">正在检测方向传感器…</div>
+        </div>
+
+        <button class="hyt_btn hyt_btn_main hyt_hide" id="hyt_permBtn" type="button">申请传感器权限（iOS 需要）</button>
+
+        <section class="hyt_notes">
+            <h2>A · 摇一摇：阈值与冷却</h2>
+            <p>用 <code>accelerationIncludingGravity</code> 的三轴合成加速度 <code>√(x²+y²+z²)</code> 判断：静止时约 9.8，甩动会冲到 20 以上，所以阈值取 18；触发后锁定 1.5 秒，保证一次摇动只出一张菜谱。</p>
+
+            <h2>B · 倾斜视差：看的是角度</h2>
+            <p><code>gamma</code> 是左右倾斜（-90°～90°），控制横向位移；<code>beta</code> 是前后翻转（-180°～180°），减去开始时的基准值后控制纵向位移。六层元素按 <code>depth</code> 3/6/8/14/22/46 错位移动，近层动得多、远层动得少；再用帧间插值让位移跟手不抖。</p>
+
+            <h2>为什么必须做降级</h2>
+            <p>电脑没有陀螺仪、部分安卓机读数直接是 <code>null</code>、iOS 13+ 还要用户点击授权。没有兜底，页面就是不动的死画面。这里三层兜底：<b>3 秒收不到数据 → 提示"当前设备不支持"</b>；<b>数据为 null → 同样提示</b>；<b>A 保留"点我抽一次"按钮、B 自动切到鼠标移动预览</b>。</p>
+
+            <h2>accelerationIncludingGravity 与 acceleration</h2>
+            <p>前者<b>含重力</b>：平放静止时 z 轴就有约 9.8；后者已扣除重力，静止接近 0。摇一摇用前者算合成加速度更直观；倾斜视差用的是角度，走 <code>deviceorientation</code>，两者不是一套数据。</p>
+        </section>
+
+        <div class="hyt_back"><a href="index.html">← 返回课堂实践中心</a></div>
+    </div>
+
+    <script>
+        /* ================= 通用：方案切换 ================= */
+        var hyt_tabShake = document.getElementById('hyt_tabShake');
+        var hyt_tabTilt = document.getElementById('hyt_tabTilt');
+        var hyt_paneShake = document.getElementById('hyt_paneShake');
+        var hyt_paneTilt = document.getElementById('hyt_paneTilt');
+
+        /**
+         * 函数功能描述：在两个方案之间切换，只高亮当前按钮并显示对应面板。
+         * @param {string} hyt_name - 'shake' 或 'tilt'
+         */
+        function hyt_switchPane(hyt_name) {
+            var hyt_isShake = hyt_name === 'shake';
+            hyt_tabShake.classList.toggle('hyt_on', hyt_isShake);
+            hyt_tabTilt.classList.toggle('hyt_on', !hyt_isShake);
+            hyt_paneShake.classList.toggle('hyt_on', hyt_isShake);
+            hyt_paneTilt.classList.toggle('hyt_on', !hyt_isShake);
+        }
+
+        /* ================= 方案 A：摇一摇 ================= */
+        var hyt_dishes = [
+            { name: '北京烤鸭', tip: '片皮卷饼，配葱丝甜面酱' },
+            { name: '麻婆豆腐', tip: '麻辣鲜香，一勺红油拌饭' },
+            { name: '白切鸡', tip: '皮爽肉滑，蘸姜葱油' },
+            { name: '肉夹馍', tip: '馍酥肉烂，腊汁浸透' },
+            { name: '小笼包', tip: '薄皮十八褶，先咬破再吸汤' },
+            { name: '螺蛳粉', tip: '闻着冲，吃着香，酸笋是灵魂' }
+        ];
+
+        var hyt_threshold = 18;        // 合成加速度阈值
+        var hyt_cooldownMs = 1500;     // 冷却 1.5s，防止一次摇动重复触发
+        var hyt_cooldownUntil = 0;
+        var hyt_hasMotion = false;     // 是否真的收到过加速度数据
+        var hyt_count = 0;             // 抽取次数
+
+        var hyt_dishEl = document.getElementById('hyt_dish');
+        var hyt_tipEl = document.getElementById('hyt_dishTip');
+        var hyt_shakeStatus = document.getElementById('hyt_shakeStatus');
+        var hyt_fallbackBtn = document.getElementById('hyt_fallbackBtn');
+
+        /**
+         * 函数功能描述：随机抽一道菜显示出来，并播放一次弹出动画。
+         * @param {string} hyt_source - 触发来源，用于状态提示
+         */
+        function hyt_pickDish(hyt_source) {
+            var hyt_item = hyt_dishes[Math.floor(Math.random() * hyt_dishes.length)];
+            hyt_dishEl.textContent = hyt_item.name;
+            hyt_tipEl.textContent = hyt_item.tip;
+
+            hyt_dishEl.classList.remove('hyt_pop');
+            void hyt_dishEl.offsetWidth;   // 强制重排，让动画能重复播放
+            hyt_dishEl.classList.add('hyt_pop');
+
+            hyt_count++;
+            hyt_shakeStatus.textContent = '来源：' + hyt_source + ' · 已抽 ' + hyt_count + ' 次';
+        }
+
+        /**
+         * 函数功能描述：显示加速度方案不可用的提示，手动抽取按钮保持可用。
+         */
+        function hyt_motionUnsupported() {
+            hyt_shakeStatus.textContent = '当前设备不支持摇一摇，请用手机打开；也可以点下面的按钮抽一次';
+        }
+
+        /**
+         * 函数功能描述：处理 devicemotion，合成加速度超过阈值且不在冷却期才抽一次。
+         * @param {DeviceMotionEvent} hyt_e - 设备运动事件
+         */
+        function hyt_onMotion(hyt_e) {
+            hyt_hasMotion = true;
+
+            var hyt_a = hyt_e.accelerationIncludingGravity;
+            if (!hyt_a || hyt_a.x === null || hyt_a.y === null || hyt_a.z === null) {
+                hyt_motionUnsupported();
+                return;
+            }
+
+            var hyt_mag = Math.sqrt(hyt_a.x * hyt_a.x + hyt_a.y * hyt_a.y + hyt_a.z * hyt_a.z);
+            if (hyt_mag > hyt_threshold && Date.now() > hyt_cooldownUntil) {
+                hyt_cooldownUntil = Date.now() + hyt_cooldownMs;
+                hyt_pickDish('摇一摇');
+            }
+        }
+
+        /**
+         * 函数功能描述：绑定 devicemotion 监听，3 秒内没数据就提示不支持。
+         * @param {boolean} hyt_granted - 权限是否已通过
+         */
+        function hyt_bindMotion(hyt_granted) {
+            if (!hyt_granted || !window.DeviceMotionEvent) {
+                hyt_motionUnsupported();
+                return;
+            }
+
+            window.addEventListener('devicemotion', hyt_onMotion);
+            hyt_shakeStatus.textContent = '加速度传感器已就绪，摇一下试试';
+
+            setTimeout(function () {
+                if (!hyt_hasMotion) { hyt_motionUnsupported(); }
+            }, 3000);
+        }
+
+        /* ================= 方案 B：倾斜视差 ================= */
+        var hyt_layers = document.querySelectorAll('.hyt_layer');
+        var hyt_hud = document.getElementById('hyt_hud');
+        var hyt_tiltStatus = document.getElementById('hyt_tiltStatus');
+
+        var hyt_targetX = 0;        // 目标横向位移，-1～1
+        var hyt_targetY = 0;        // 目标纵向位移，-1～1
+        var hyt_nowX = 0;           // 当前值，用于帧间平滑
+        var hyt_nowY = 0;
+        var hyt_baseBeta = null;    // 初始前后倾角基准
+        var hyt_hasOrient = false;  // 是否真的收到过方向数据
+        var hyt_tiltMode = 'sensor';// sensor / pointer
+
+        /**
+         * 函数功能描述：把数值压到 -1～1，避免过度倾斜时画面飞出容器。
+         * @param {number} hyt_v - 原始数值
+         * @returns {number} 限制后的数值
+         */
+        function hyt_clamp1(hyt_v) {
+            return Math.max(-1, Math.min(1, hyt_v));
+        }
+
+        /**
+         * 函数功能描述：按各层 depth 写入 transform，形成近层动得多、远层动得少的视差。
+         */
+        function hyt_drawLayers() {
+            for (var hyt_i = 0; hyt_i < hyt_layers.length; hyt_i++) {
+                var hyt_depth = parseFloat(hyt_layers[hyt_i].getAttribute('data-depth')) || 0;
+                hyt_layers[hyt_i].style.transform =
+                    'translate3d(' + (-hyt_nowX * hyt_depth) + 'px, ' + (-hyt_nowY * hyt_depth) + 'px, 0)';
+            }
+        }
+
+        /**
+         * 函数功能描述：用 rAF 做帧间插值，让位移跟手、不抖动。
+         */
+        function hyt_loop() {
+            hyt_nowX += (hyt_targetX - hyt_nowX) * 0.12;
+            hyt_nowY += (hyt_targetY - hyt_nowY) * 0.12;
+            hyt_drawLayers();
+            requestAnimationFrame(hyt_loop);
+        }
+
+        /**
+         * 函数功能描述：读取 deviceorientation 的 gamma/beta 换算位移，并刷新角度读数。
+         * @param {DeviceOrientationEvent} hyt_e - 设备方向事件
+         */
+        function hyt_onOrient(hyt_e) {
+            if (hyt_e.gamma === null && hyt_e.beta === null) {
+                hyt_tiltUnsupported();
+                return;
+            }
+
+            hyt_hasOrient = true;
+            hyt_tiltMode = 'sensor';
+
+            var hyt_gamma = hyt_e.gamma || 0;
+            var hyt_beta = hyt_e.beta || 0;
+            if (hyt_baseBeta === null) { hyt_baseBeta = hyt_beta; }
+
+            hyt_targetX = hyt_clamp1(hyt_gamma / 28);
+            hyt_targetY = hyt_clamp1((hyt_beta - hyt_baseBeta) / 22);
+
+            hyt_hud.textContent = 'γ ' + hyt_gamma.toFixed(1) + '° / β ' + hyt_beta.toFixed(1) + '°';
+        }
+
+        /**
+         * 函数功能描述：没有方向传感器时，用鼠标位置算出同样的位移目标值做预览。
+         * @param {MouseEvent} hyt_e - 鼠标事件
+         */
+        function hyt_onPointer(hyt_e) {
+            if (hyt_tiltMode !== 'pointer') { return; }
+            hyt_targetX = (hyt_e.clientX / window.innerWidth - 0.5) * 2;
+            hyt_targetY = (hyt_e.clientY / window.innerHeight - 0.5) * 2;
+            hyt_hud.textContent = '鼠标预览';
+        }
+
+        /**
+         * 函数功能描述：切到降级模式，提示不支持并把鼠标移动接入预览。
+         */
+        function hyt_tiltUnsupported() {
+            if (hyt_tiltMode === 'pointer') { return; }
+            hyt_tiltMode = 'pointer';
+            hyt_tiltStatus.textContent = '当前设备不支持倾斜传感器，请用手机打开；已切换为鼠标移动预览';
+            window.addEventListener('mousemove', hyt_onPointer);
+        }
+
+        /**
+         * 函数功能描述：绑定 deviceorientation，3 秒内没数据就降级。
+         * @param {boolean} hyt_granted - 权限是否已通过
+         */
+        function hyt_bindOrient(hyt_granted) {
+            if (!hyt_granted || !window.DeviceOrientationEvent) {
+                hyt_tiltUnsupported();
+                return;
+            }
+
+            window.addEventListener('deviceorientation', hyt_onOrient);
+            hyt_tiltStatus.textContent = '方向传感器已就绪，左右倾斜手机试试';
+
+            setTimeout(function () {
+                if (!hyt_hasOrient) { hyt_tiltUnsupported(); }
+            }, 3000);
+        }
+
+        /* ================= 权限与启动 ================= */
+        var hyt_permBtn = document.getElementById('hyt_permBtn');
+
+        /**
+         * 函数功能描述：判断是否需要用户点击授权（iOS 13+ 的两个事件都可能需要）。
+         * @returns {boolean} 是否需要显示授权按钮
+         */
+        function hyt_needPermission() {
+            return (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function')
+                || (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function');
+        }
+
+        /**
+         * 函数功能描述：依次申请加速度与方向权限，按各自结果分别绑定或降级。
+         */
+        function hyt_requestAll() {
+            hyt_permBtn.disabled = true;
+
+            var hyt_motionStep = Promise.resolve('granted');
+            if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function') {
+                hyt_motionStep = DeviceMotionEvent.requestPermission().catch(function () { return 'denied'; });
+            }
+
+            hyt_motionStep.then(function (hyt_stateMotion) {
+                var hyt_orientStep = Promise.resolve('granted');
+                if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    hyt_orientStep = DeviceOrientationEvent.requestPermission().catch(function () { return 'denied'; });
+                }
+
+                hyt_orientStep.then(function (hyt_stateOrient) {
+                    hyt_permBtn.classList.add('hyt_hide');
+                    hyt_bindMotion(hyt_stateMotion === 'granted');
+                    hyt_bindOrient(hyt_stateOrient === 'granted');
+                });
+            });
+        }
+
+        hyt_tabShake.addEventListener('click', function () { hyt_switchPane('shake'); });
+        hyt_tabTilt.addEventListener('click', function () { hyt_switchPane('tilt'); });
+        hyt_fallbackBtn.addEventListener('click', function () { hyt_pickDish('手动点击'); });
+
+        requestAnimationFrame(hyt_loop);   // 视差渲染一直跑，切换面板也不中断
+
+        if (hyt_needPermission()) {
+            hyt_permBtn.classList.remove('hyt_hide');
+            hyt_permBtn.addEventListener('click', hyt_requestAll);
+            hyt_shakeStatus.textContent = 'iOS 需要先点下方按钮授权加速度传感器';
+            hyt_tiltStatus.textContent = 'iOS 需要先点下方按钮授权方向传感器';
+        } else {
+            hyt_bindMotion(true);
+            hyt_bindOrient(true);
+        }
+    </script>
+</body>
+</html>

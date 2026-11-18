@@ -262,3 +262,77 @@ Use plugin: trae-remote-official:computer-use 检查本机是否已有 Git 公�
 ```
 按时间插进去
 ```
+
+## 记录 #33
+- **时间**: 2026-11-13 13:46:00（补录）
+- **模型**: DeepSeek-V4.1-Flash
+- **提示词**:
+```
+https://spontaneous-valkyrie-4e4229.netlify.app/json-fetch-lesson
+★
+完成 在 Trae 里的完整操作步骤中的2和3
+```
+
+## 记录 #34
+- **时间**: 2026-11-13 13:59:27
+- **模型**: DeepSeek-V4.1-Flash
+- **提示词**:
+```
+你为啥不把我给你的指令记到hyt_prompt.md里
+```
+
+## 记录 #35
+- **时间**: 2026-11-13 14:01:53
+- **模型**: DeepSeek-V4.1-Flash
+- **提示词**:
+```
+给我新建一个html文件，显示上图下文的结构，图片和文字通过本地启动服务器获取当前文件夹下面的db里面db.json的poems里面的图片，title和content。并给我生成server.js数据服务器文件，server.js放在db文件夹中。其中端口号为3004。
+```
+
+## 记录 #36
+- **时间**: 2026-11-18 13:47:27
+- **模型**: DeepSeek-V4.1-Flash
+- **提示词**:
+```
+https://spontaneous-valkyrie-4e4229.netlify.app/mobile-events-lesson完成网页任务一、二、三、四
+```
+
+## 记录 #37
+- **时间**: 2026-11-18 13:57:54
+- **模型**: DeepSeek-V4.1-Flash
+- **提示词**:
+```
+把所有wy都改成hyt并完成https://spontaneous-valkyrie-4e4229.netlify.app/mobile-events-lesson的任务一、二、三、四
+```
+
+## 记录 #38
+- **时间**: 2026-11-18 14:07:15
+- **模型**: DeepSeek-V4.1-Flash
+- **提示词**:
+```
+https://spontaneous-valkyrie-4e4229.netlify.app/mobile-events-lesson任务四两个全完成
+```
+
+## 记录 #39
+- **时间**: 2026-11-18 14:14:16
+- **模型**: DeepSeek-V4.1-Flash
+- **提示词**:
+```
+任务四两个游戏要在一起，任务三也要全弄
+```
+
+## 记录 #40
+- **时间**: 2026-11-18 14:30:05
+- **模型**: DeepSeek-V4.1-Flash
+- **提示词**:
+```
+https://spontaneous-valkyrie-4e4229.netlify.app/mobile-events-lesson任务三都要写且放在一起
+```
+
+## 记录 #41
+- **时间**: 2026-11-18 14:32:39
+- **模型**: DeepSeek-V4.1-Flash
+- **提示词**:
+```
+好的，执行吧
+```

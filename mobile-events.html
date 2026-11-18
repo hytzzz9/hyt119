@@ -1,0 +1,346 @@
+<!--
+  作者：侯雨彤
+  建立时间：2026-11-18
+  使用大模型：DeepSeek-V4.1-Flash
+  功能名称：任务一·事件侦探：触摸事件探针、实时事件日志、轨迹草图与事件触发顺序记录
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>事件侦探 · 一次拖动到底发生了什么</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: system-ui, -apple-system, "Microsoft YaHei", sans-serif;
+            background: #f5f6f8;
+            color: #1f2328;
+            padding: 20px 16px 48px;
+            line-height: 1.7;
+        }
+
+        .hyt_wrap { max-width: 720px; margin: 0 auto; }
+
+        .hyt_head h1 { font-size: 22px; margin-bottom: 6px; }
+        .hyt_head p { font-size: 13px; color: #6b7280; margin-bottom: 18px; }
+
+        .hyt_panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+        }
+
+        .hyt_panel h2 { font-size: 16px; margin-bottom: 10px; }
+
+        /* 探针区：接管手势，区域内拖动不带动页面滚动 */
+        .hyt_probe {
+            height: 150px;
+            border: 2px dashed #b9c4d4;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #7c8798;
+            font-size: 13px;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            background: #fbfcfe;
+        }
+
+        .hyt_btns { display: flex; gap: 10px; margin-top: 12px; }
+
+        .hyt_btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #eef2f7;
+            color: #33415c;
+            font-size: 14px;
+        }
+
+        .hyt_btn:active { background: #dde6f2; }
+
+        .hyt_log {
+            list-style: none;
+            max-height: 210px;
+            overflow-y: auto;
+            font-family: Consolas, monospace;
+            font-size: 12.5px;
+            background: #0f172a;
+            color: #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 12px;
+        }
+
+        .hyt_log li { padding: 2px 0; }
+        .hyt_log_t { color: #64748b; }
+        .hyt_log b { color: #38bdf8; font-weight: 600; }
+
+        .hyt_stat {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #33415c;
+            background: #eef4ff;
+            border-radius: 8px;
+            padding: 8px 12px;
+        }
+
+        .hyt_canvas {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 8px;
+            background: #fffdf7;
+            border: 1px solid #e5e7eb;
+        }
+
+        .hyt_table { width: 100%; border-collapse: collapse; font-size: 13px; display: block; overflow-x: auto; }
+        .hyt_table th, .hyt_table td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; vertical-align: top; }
+        .hyt_table th { background: #f3f5f9; font-weight: 600; white-space: nowrap; }
+        .hyt_table td { min-width: 110px; }
+
+        .hyt_qa dt { font-weight: 600; color: #1f2328; margin-top: 12px; }
+        .hyt_qa dd { color: #4b5563; margin: 4px 0 0 0; font-size: 14px; }
+        .hyt_qa dd b { color: #c2410c; }
+
+        .hyt_back { text-align: center; font-size: 13px; margin-top: 20px; }
+        .hyt_back a { color: #2563eb; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="hyt_wrap">
+        <header class="hyt_head">
+            <h1>事件侦探 · 一次拖动到底发生了什么</h1>
+            <p>手机或 DevTools 设备模式打开本页 → 在探针区依次做 5 种操作 → 观察日志顺序。</p>
+        </header>
+
+        <section class="hyt_panel">
+            <h2>探针区</h2>
+            <div class="hyt_probe" id="hyt_probe">
+                在此按下 / 拖动 / 双指 / 长按<br>事件会实时记录到下面
+            </div>
+            <div class="hyt_btns">
+                <button class="hyt_btn" id="hyt_clearBtn" type="button">清空日志与轨迹</button>
+            </div>
+            <ul class="hyt_log" id="hyt_log"></ul>
+            <div class="hyt_stat" id="hyt_stat">本次手势 touchmove：0 次</div>
+            <canvas class="hyt_canvas" id="hyt_canvas" width="640" height="280"></canvas>
+            <div class="hyt_stat">↑ 轨迹草图：拖动时按真实坐标连线，用于说明手指的实际路径</div>
+        </section>
+
+        <section class="hyt_panel">
+            <h2>5 种操作的事件顺序</h2>
+            <table class="hyt_table">
+                <tr>
+                    <th>操作</th>
+                    <th>事件触发顺序</th>
+                    <th>touchmove 次数</th>
+                    <th>是否补发 click</th>
+                </tr>
+                <tr>
+                    <td>单击（轻点不移动）</td>
+                    <td>touchstart → touchend → click</td>
+                    <td>0</td>
+                    <td>有</td>
+                </tr>
+                <tr>
+                    <td>向上拖动约 150px</td>
+                    <td>touchstart → touchmove × 多次 → touchend</td>
+                    <td>约 30～60（≈每帧 1 次）</td>
+                    <td>无（位移超过容差）</td>
+                </tr>
+                <tr>
+                    <td>向左快速滑</td>
+                    <td>touchstart → touchmove × 多次 → touchend</td>
+                    <td>约 20～50（时长短则少）</td>
+                    <td>无</td>
+                </tr>
+                <tr>
+                    <td>双指触摸（可选）</td>
+                    <td>touchstart（第 1 指）→ touchstart（第 2 指）→ touchmove → touchend（先抬）→ touchend（后抬）</td>
+                    <td>有，且 touches.length = 2</td>
+                    <td>无</td>
+                </tr>
+                <tr>
+                    <td>长按约 1 秒后抬起</td>
+                    <td>touchstart →（600ms 长按回调）→ touchend → click</td>
+                    <td>0～数次抖动</td>
+                    <td>通常有</td>
+                </tr>
+                <tr>
+                    <td>被电话 / 通知打断</td>
+                    <td>touchstart → touchcancel</td>
+                    <td>—</td>
+                    <td>无</td>
+                </tr>
+            </table>
+            <div class="hyt_stat">说明：touchmove 次数随设备刷新率与拖动时长波动，表中为设备模式下的典型区间，你在自己手机上测会略有差异。</div>
+        </section>
+
+        <section class="hyt_panel hyt_qa">
+            <h2>验收三问</h2>
+            <dl>
+                <dt>① 一次拖动里 touchmove 大约触发多少次？和距离有什么关系？</dt>
+                <dd>大约<b>每帧一次</b>：60fps 下一段持续 1 秒的拖动约 30～60 次。次数由"手指在移动中停留的时间"决定，<b>与距离没有直接对应关系</b>——拖得远只是每帧走得更远，并不代表触发更多次。</dd>
+
+                <dt>② click 出现在 touchend 之前还是之后？</dt>
+                <dd><b>之后</b>。顺序是 touchstart → touchend → click，而且只有在位移很小（没有被判定为滑动）时浏览器才会补发 click。</dd>
+
+                <dt>③ 如果把 touchend 换成 touchcancel，会发生什么？</dt>
+                <dd>正常抬手<b>不会</b>触发 touchcancel——它只在系统打断时出现（来电、通知、浏览器接管手势、手势越界）。如果把收尾逻辑只写在 touchend，被打断时就不会执行，状态会卡住（拖动标记不清、长按定时器不清理）。正确做法是<b>两者绑定同一个收尾函数</b>。</dd>
+            </dl>
+        </section>
+
+        <div class="hyt_back"><a href="index.html">← 返回课堂实践中心</a></div>
+    </div>
+
+    <script>
+        var hyt_probe = document.getElementById('hyt_probe');
+        var hyt_logList = document.getElementById('hyt_log');
+        var hyt_stat = document.getElementById('hyt_stat');
+        var hyt_canvas = document.getElementById('hyt_canvas');
+        var hyt_ctx = hyt_canvas.getContext('2d');
+
+        var hyt_t0 = 0;          // 第一条事件的时刻，用于显示相对毫秒
+        var hyt_moveCount = 0;   // 本次手势中 touchmove 的累计次数
+        var hyt_longTimer = null;
+        var hyt_longFired = false;
+        var hyt_lastPoint = null;
+
+        /**
+         * 函数功能描述：把一条触摸事件写入实时日志，显示相对时间、事件名与关键信息。
+         * @param {string} hyt_name - 事件名称
+         * @param {string} hyt_extra - 附带的说明文字
+         */
+        function hyt_log(hyt_name, hyt_extra) {
+            var hyt_now = Date.now();
+            if (!hyt_t0) { hyt_t0 = hyt_now; }
+
+            var hyt_li = document.createElement('li');
+            hyt_li.innerHTML = '<span class="hyt_log_t">+' + (hyt_now - hyt_t0) + 'ms</span> '
+                + '<b>' + hyt_name + '</b>'
+                + (hyt_extra ? ' ' + hyt_extra : '');
+            hyt_logList.appendChild(hyt_li);
+            hyt_logList.scrollTop = hyt_logList.scrollHeight;
+        }
+
+        /**
+         * 函数功能描述：把手指当前位置换算到画布坐标，并用折线画出拖动轨迹。
+         * @param {number} hyt_clientX - 触点相对视口的 X
+         * @param {number} hyt_clientY - 触点相对视口的 Y
+         */
+        function hyt_tracePoint(hyt_clientX, hyt_clientY) {
+            var hyt_rect = hyt_probe.getBoundingClientRect();
+            var hyt_x = (hyt_clientX - hyt_rect.left) / hyt_rect.width * hyt_canvas.width;
+            var hyt_y = (hyt_clientY - hyt_rect.top) / hyt_rect.height * hyt_canvas.height;
+
+            if (hyt_lastPoint) {
+                hyt_ctx.strokeStyle = '#e07a4f';
+                hyt_ctx.lineWidth = 2;
+                hyt_ctx.beginPath();
+                hyt_ctx.moveTo(hyt_lastPoint.x, hyt_lastPoint.y);
+                hyt_ctx.lineTo(hyt_x, hyt_y);
+                hyt_ctx.stroke();
+            }
+            hyt_ctx.fillStyle = '#c2410c';
+            hyt_ctx.beginPath();
+            hyt_ctx.arc(hyt_x, hyt_y, 2.4, 0, Math.PI * 2);
+            hyt_ctx.fill();
+
+            hyt_lastPoint = { x: hyt_x, y: hyt_y };
+        }
+
+        /**
+         * 函数功能描述：清空日志、计数与轨迹画布，准备记录下一次手势。
+         */
+        function hyt_resetLog() {
+            hyt_logList.innerHTML = '';
+            hyt_ctx.clearRect(0, 0, hyt_canvas.width, hyt_canvas.height);
+            hyt_t0 = 0;
+            hyt_moveCount = 0;
+            hyt_lastPoint = null;
+            hyt_stat.textContent = '本次手势 touchmove：0 次';
+            clearTimeout(hyt_longTimer);
+        }
+
+        /**
+         * 函数功能描述：手指按下时记录起点、清零本帧计数，并启动 600ms 长按计时。
+         * @param {TouchEvent} hyt_e - 触摸事件对象
+         */
+        function hyt_onTouchStart(hyt_e) {
+            hyt_moveCount = 0;
+            hyt_longFired = false;
+            hyt_lastPoint = null;
+
+            hyt_log('touchstart', 'touches.length=' + hyt_e.touches.length
+                + ' (' + Math.round(hyt_e.touches[0].clientX) + ', ' + Math.round(hyt_e.touches[0].clientY) + ')');
+
+            clearTimeout(hyt_longTimer);
+            hyt_longTimer = setTimeout(function () {
+                hyt_longFired = true;
+                hyt_log('长按回调', '（600ms 触发，注意它发生在 touchend 之前）');
+            }, 600);
+        }
+
+        /**
+         * 函数功能描述：手指移动时累加次数、更新探针中心坐标的轨迹草图。
+         * @param {TouchEvent} hyt_e - 触摸事件对象
+         */
+        function hyt_onTouchMove(hyt_e) {
+            hyt_moveCount++;
+
+            var hyt_t = hyt_e.touches[0];
+            hyt_tracePoint(hyt_t.clientX, hyt_t.clientY);
+
+            if (hyt_moveCount === 1 || hyt_moveCount % 10 === 0) {
+                hyt_log('touchmove ×' + hyt_moveCount, '(' + Math.round(hyt_t.clientX) + ', ' + Math.round(hyt_t.clientY) + ')');
+            }
+            hyt_stat.textContent = '本次手势 touchmove：' + hyt_moveCount + ' 次';
+        }
+
+        /**
+         * 函数功能描述：手指抬起时清除长按计时并记录位移，区分"点击"与"拖动"。
+         * @param {TouchEvent} hyt_e - 触摸事件对象
+         */
+        function hyt_onTouchEnd(hyt_e) {
+            clearTimeout(hyt_longTimer);
+
+            var hyt_t = hyt_e.changedTouches[0];   // 抬手时 touches 已清空，必须用 changedTouches
+            hyt_log('touchend', 'changedTouches[0]=(' + Math.round(hyt_t.clientX) + ', ' + Math.round(hyt_t.clientY) + ')'
+                + '，本手势 touchmove 共 ' + hyt_moveCount + ' 次');
+
+            if (hyt_longFired) {
+                hyt_log('（提示）长按已触发过，顺序是 长按回调 → touchend → click', '');
+            }
+        }
+
+        /**
+         * 函数功能描述：系统打断手势时清理定时器并记录 touchcancel。
+         */
+        function hyt_onTouchCancel() {
+            clearTimeout(hyt_longTimer);
+            hyt_log('touchcancel', '（系统打断：来电 / 通知 / 浏览器接管手势）');
+        }
+
+        hyt_probe.addEventListener('touchstart', hyt_onTouchStart, { passive: true });
+        hyt_probe.addEventListener('touchmove', hyt_onTouchMove, { passive: true });
+        hyt_probe.addEventListener('touchend', hyt_onTouchEnd, { passive: true });
+        hyt_probe.addEventListener('touchcancel', hyt_onTouchCancel, { passive: true });
+
+        // 触摸后浏览器补发的 click，用来验证"click 在 touchend 之后"
+        hyt_probe.addEventListener('click', function () {
+            hyt_log('click', '（浏览器在 touchend 之后才补发）');
+        });
+
+        document.getElementById('hyt_clearBtn').addEventListener('click', hyt_resetLog);
+    </script>
+</body>
+</html>

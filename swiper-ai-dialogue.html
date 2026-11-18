@@ -70,14 +70,14 @@
 
   <!-- 任务一 -->
   <div class="sec">
-    <h2>任务一 · 提示词工程师<small>用两轮提示词让 AI 生成 #wySw4 的完整配置</small></h2>
+    <h2>任务一 · 提示词工程师<small>用两轮提示词让 AI 生成 #hytSw4 的完整配置</small></h2>
 
     <h3>需求拆解（写提示词前先列清单）</h3>
     <table>
       <tr><th>编号</th><th>需求</th><th>对应参数</th></tr>
       <tr><td>①</td><td>无缝循环</td><td><code class="inline">loop: true</code></td></tr>
       <tr><td>②</td><td>3.2 秒自动翻页，手动操作后不停止</td><td><code class="inline">autoplay: { delay: 3200, disableOnInteraction: false }</code></td></tr>
-      <tr><td>③</td><td>圆点分页器且可点击跳转</td><td><code class="inline">pagination: { el: '#wyPag4', clickable: true }</code></td></tr>
+      <tr><td>③</td><td>圆点分页器且可点击跳转</td><td><code class="inline">pagination: { el: '#hytPag4', clickable: true }</code></td></tr>
       <tr><td>④</td><td>初始效果为 cube</td><td><code class="inline">effect: 'cube'</code></td></tr>
     </table>
 
@@ -89,11 +89,11 @@
     </div>
     <div class="bubble ai">
       <span class="who">AI 回答（第 1 轮）</span>
-      <pre>new Swiper('#wySw4', {
+      <pre>new Swiper('#hytSw4', {
   loop: true,
   autoplay: true,
   effect: 'cube',
-  pagination: { el: '#wyPag4' }
+  pagination: { el: '#hytPag4' }
 });</pre>
       这是一份最基础的配置，已经实现了循环、自动播放和立方体效果。
     </div>
@@ -112,17 +112,17 @@
     <span class="round r2">ROUND 2 · 精确到数值与交互行为</span>
     <div class="bubble me">
       <span class="who">我 → AI</span>
-      请基于 Swiper 11 生成初始化 <code class="inline">#wySw4</code> 的完整配置，逐条满足：<br>
+      请基于 Swiper 11 生成初始化 <code class="inline">#hytSw4</code> 的完整配置，逐条满足：<br>
       1）<code class="inline">loop: true</code> 无缝循环；<br>
       2）<code class="inline">autoplay</code> 每张停留 <b>3200 毫秒</b>，并且用户手动滑动或点圆点之后<b>仍然继续自动播放</b>（即 disableOnInteraction 必须为 false）；<br>
-      3）分页器绑定 <code class="inline">#wyPag4</code>，且<b>圆点可点击跳转</b>（clickable: true）；<br>
+      3）分页器绑定 <code class="inline">#hytPag4</code>，且<b>圆点可点击跳转</b>（clickable: true）；<br>
       4）初始效果固定为 <b>cube</b>，动画时长 800 毫秒，并给出 cubeEffect 的 shadow / shadowOffset / slideShadows 建议值；<br>
       5）用一个函数封装，方便后续按不同 effect 重建实例。
     </div>
     <div class="bubble ai">
       <span class="who">AI 回答（第 2 轮）</span>
       <pre>function createSwiper4(fx) {
-  return new Swiper('#wySw4', {
+  return new Swiper('#hytSw4', {
     loop: true,
     effect: fx,
     speed: 800,
@@ -131,7 +131,7 @@
       disableOnInteraction: false
     },
     pagination: {
-      el: '#wyPag4',
+      el: '#hytPag4',
       clickable: true
     },
     cubeEffect: {
@@ -148,7 +148,7 @@ var swiper4 = createSwiper4('cube');</pre>
     </div>
 
     <h3>第 2 轮验证结论</h3>
-    <p><b>一句话结论：</b>把"自动播放""圆点"这类模糊词替换成具体毫秒数、布尔值、元素 id 之后，第 2 轮配置 4 项需求全部达标，页面中 <code class="inline">#wySw4</code> 初始即为可自动翻页的立方体轮播。</p>
+    <p><b>一句话结论：</b>把"自动播放""圆点"这类模糊词替换成具体毫秒数、布尔值、元素 id 之后，第 2 轮配置 4 项需求全部达标，页面中 <code class="inline">#hytSw4</code> 初始即为可自动翻页的立方体轮播。</p>
     <ul>
       <li>loop 循环：最后一张继续往后翻会回到第一张 <span class="ok">✓</span></li>
       <li>自动播放 3.2 秒：静止 3.2 秒后自动切换 <span class="ok">✓</span></li>
@@ -160,7 +160,7 @@ var swiper4 = createSwiper4('cube');</pre>
     <p>第一版提示词漏掉的是<b>"手动操作后是否继续自动播放"</b>和<b>"圆点是否可点击"</b>这两个交互细节，以及自动播放的<b>具体时长</b>。第二轮我没有写更多形容词，而是把每条需求翻译成"参数名 + 具体值 + 期望行为"三件套：</p>
     <ul>
       <li>"自动播放" → <code class="inline">delay: 3200</code> + <code class="inline">disableOnInteraction: false</code></li>
-      <li>"带圆点" → <code class="inline">el: '#wyPag4'</code> + <code class="inline">clickable: true</code></li>
+      <li>"带圆点" → <code class="inline">el: '#hytPag4'</code> + <code class="inline">clickable: true</code></li>
       <li>"立方体" → <code class="inline">effect: 'cube'</code> + 补充 cubeEffect 的阴影参数</li>
     </ul>
     <p>AI 第一次给的代码错在：把 <code class="inline">autoplay</code> 直接写成布尔值 <code class="inline">true</code>，只能吃默认 3 秒，且默认在用户交互后停止；<code class="inline">pagination</code> 只传了 el，没写 <code class="inline">clickable</code>，圆点变成纯展示。</p>
@@ -215,7 +215,7 @@ var swiper4 = createSwiper4('cube');</pre>
     <p>首艘国产大型邮轮，2024 年 1 月商业首航。展品图由 AI 生成（横版 16:9），slide 结构与其他五件展品完全一致：</p>
     <pre>&lt;div class="swiper-slide"&gt;
   &lt;img src="swiper-imgs/aida_modu_1.jpg" alt="爱达·魔都号邮轮"&gt;
-  &lt;div class="wy-cap"&gt;
+  &lt;div class="hyt-cap"&gt;
     &lt;h3&gt;爱达·魔都号&lt;/h3&gt;
     &lt;p&gt;首艘国产大型邮轮 · 2024 年 1 月商业首航&lt;/p&gt;
   &lt;/div&gt;

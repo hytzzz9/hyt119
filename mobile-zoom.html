@@ -1,0 +1,435 @@
+<!--
+  作者：侯雨彤
+  建立时间：2026-11-18
+  使用大模型：DeepSeek-V4.1-Flash
+  功能名称：任务三·图片查看器：双指缩放 1～4 倍、双击 1x/2x 切换、放大后单指拖动并限制边界
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片查看器 · 双指缩放 / 双击放大 / 拖动</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: system-ui, -apple-system, "Microsoft YaHei", sans-serif;
+            background: #101114;
+            color: #e6e8ec;
+            padding: 18px 16px 44px;
+            -webkit-touch-callout: none;
+        }
+
+        .hyt_wrap { max-width: 720px; margin: 0 auto; }
+
+        .hyt_head h1 { font-size: 19px; margin-bottom: 6px; }
+        .hyt_head p { font-size: 12.5px; color: #9aa3b2; line-height: 1.8; }
+
+        .hyt_viewer {
+            position: relative;
+            margin-top: 14px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #000;
+            aspect-ratio: 16 / 9;   /* 与图片比例一致，避免留黑边导致边界算错 */
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .hyt_img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform-origin: center center;
+            will-change: transform;
+        }
+
+        /* 缩放比例指示器 */
+        .hyt_hud {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            font-size: 12px;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, .55);
+            color: #e6e8ec;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hyt_ops { margin-top: 12px; display: flex; gap: 10px; }
+
+        .hyt_btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #2b2f38;
+            border-radius: 9px;
+            background: #1a1d23;
+            color: #cfd5df;
+            font-size: 13px;
+        }
+
+        .hyt_btn:active { background: #242833; }
+
+        .hyt_check {
+            margin-top: 16px;
+            background: #171a20;
+            border: 1px solid #242832;
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.85;
+            color: #b3bac7;
+        }
+
+        .hyt_check h2 { font-size: 14px; color: #e6e8ec; margin-bottom: 8px; }
+
+        .hyt_check ul { list-style: none; }
+
+        .hyt_check li { padding: 4px 0; border-bottom: 1px dashed #242832; }
+        .hyt_check li:last-child { border-bottom: none; }
+
+        .hyt_check li b { color: #7cc47f; margin-right: 6px; }
+
+        .hyt_check code { background: #1f2530; color: #9cc4ff; padding: 1px 5px; border-radius: 4px; }
+
+        .hyt_note {
+            margin-top: 16px;
+            background: #171a20;
+            border: 1px solid #242832;
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.9;
+            color: #b3bac7;
+        }
+
+        .hyt_note h2 { font-size: 14px; color: #e6e8ec; margin-bottom: 6px; }
+
+        .hyt_back { text-align: center; font-size: 13px; margin-top: 18px; }
+        .hyt_back a { color: #7cb0ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="hyt_wrap">
+        <header class="hyt_head">
+            <h1>图片查看器</h1>
+            <p>双指缩放请用手机打开（1×～4×）· 转动两指可旋转 · 双击在 1× / 2× 之间切换 · 放大后单指拖动查看细节</p>
+        </header>
+
+        <div class="hyt_viewer" id="hyt_stage">
+            <img class="hyt_img" id="hyt_img" src="swiper-imgs/aida_modu_1.jpg" alt="爱达·魔都号">
+            <span class="hyt_hud" id="hyt_hud">1.0×</span>
+        </div>
+
+        <div class="hyt_ops">
+            <button class="hyt_btn" id="hyt_resetBtn" type="button">复位到 1×（角度归零）</button>
+        </div>
+
+        <section class="hyt_check">
+            <h2>任务三 · 七步要求与四条验收（全部在本页）</h2>
+            <ul>
+                <li><b>①</b>容器：<code>overflow:hidden</code> + <code>touch-action:none</code> + <code>user-select:none</code>，写在 <code>.hyt_viewer</code> 上</li>
+                <li><b>②</b><code>touchstart</code>：记录单指 / 双指状态、两指初始距离与连线角度 —— <code>hyt_onStart</code></li>
+                <li><b>③</b><code>touchmove</code>：按两指距离比例缩放并夹在 1～4 倍，以两指中点为基准反推位移 —— <code>hyt_onMove</code></li>
+                <li><b>④</b>放大后单指拖动，抬手时收边界 —— 单指分支 + <code>hyt_clamp</code></li>
+                <li><b>⑤</b>双击在 1× / 2× 之间切换，0.25s 过渡 —— <code>hyt_onEnd</code> 判定 + <code>hyt_toggleZoom</code></li>
+                <li><b>⑥</b>打开即提示"双指缩放请用手机打开"，每个函数都有功能注释 —— 页面副标题 + JSDoc</li>
+                <li><b>⑦</b>说明如何保证"缩放不跳" —— 见下方公式段</li>
+                <li><b>验收①</b>双指缩放不跳、不甩出画面 —— <code>t₁ = m - (m₀ - t₀)·k</code></li>
+                <li><b>验收②</b>边界限制：倍数硬夹 1～4，位移按倍数收口</li>
+                <li><b>验收③</b>1× 时位移上限为 0，根本拖不动</li>
+                <li><b>验收④</b>转屏只重算边界，倍数 / 位移 / 角度都保留</li>
+                <li><b>加分</b>双指旋转 + 右下角"倍数 × · 角度 °"指示器</li>
+            </ul>
+        </section>
+
+        <section class="hyt_note">
+            <h2>怎么保证"缩放不跳"</h2>
+            缩放时不是简单地把中心放大，而是先记下两指中点在图片上的位置：<br>
+            <code>q = (m₀ - t₀) / s₀</code>，缩放后再反推<br>
+            <code>t₁ = m - q × s₁</code>。<br>
+            m₀ 是手势开始时的两指中点、m 是当前中点，所以两指一边捏一边移动，图片也跟着平移，手指下的那个点始终停在原处——既不跳走，也不会甩出画面。
+
+            <h2>加分项：双指旋转</h2>
+            手势开始时记下两指连线的角度 <code>atan2(y₂-y₁, x₂-x₁)</code>，移动时把角度差累加到
+            <code>rotate()</code>；角度差先归一化到 -180°～180°，所以绕过大半圈也不会突然翻一圈。旋转和缩放共用同一次 touchmove，<code>transform</code> 顺序为先平移、再旋转、再缩放。
+
+            <h2>边界与横竖屏</h2>
+            位移上限按倍数计算：<code>(容器尺寸 × 倍数 − 容器尺寸) / 2</code>，1× 时上限为 0，所以根本拖不动；超出容器的部分由 <code>overflow: hidden</code> 裁掉。横竖屏切换只重新收边界，倍数、位移与角度都保留，状态不丢。
+        </section>
+
+        <div class="hyt_back"><a href="index.html">← 返回课堂实践中心</a></div>
+    </div>
+
+    <script>
+        var hyt_stage = document.getElementById('hyt_stage');
+        var hyt_img = document.getElementById('hyt_img');
+        var hyt_hud = document.getElementById('hyt_hud');
+
+        var hyt_min = 1;      // 最小倍数
+        var hyt_max = 4;      // 最大倍数
+        var hyt_scale = 1;    // 当前倍数
+        var hyt_tx = 0;       // 当前横向平移
+        var hyt_ty = 0;       // 当前纵向平移
+        var hyt_rot = 0;      // 当前旋转角度（度），加分项的"双指旋转"
+
+        // 单指拖动用的起点
+        var hyt_dragStartX = 0;
+        var hyt_dragStartY = 0;
+        var hyt_dragTx = 0;
+        var hyt_dragTy = 0;
+
+        // 双指缩放 / 旋转用的起点
+        var hyt_pinch = false;
+        var hyt_hadPinch = false;
+        var hyt_startDist = 0;
+        var hyt_startScale = 1;
+        var hyt_startTx = 0;
+        var hyt_startTy = 0;
+        var hyt_startMidX = 0;
+        var hyt_startMidY = 0;
+        var hyt_startAngle = 0;   // 手势开始时两指连线的角度
+        var hyt_startRot = 0;     // 手势开始时的旋转角
+
+        // 双击判定
+        var hyt_lastTap = 0;
+        var hyt_tapX = 0;
+        var hyt_tapY = 0;
+
+        /**
+         * 函数功能描述：把页面坐标换算成"相对容器中心"的坐标，缩放计算统一用这套坐标系。
+         * @param {number} hyt_clientX - 触点相对视口的 X
+         * @param {number} hyt_clientY - 触点相对视口的 Y
+         * @returns {{x:number, y:number}} 相对容器中心的坐标
+         */
+        function hyt_centerOf(hyt_clientX, hyt_clientY) {
+            var hyt_rect = hyt_stage.getBoundingClientRect();
+            return {
+                x: hyt_clientX - hyt_rect.left - hyt_rect.width / 2,
+                y: hyt_clientY - hyt_rect.top - hyt_rect.height / 2
+            };
+        }
+
+        /**
+         * 函数功能描述：计算两根手指之间的直线距离，用于得到缩放比例。
+         */
+        function hyt_dist(hyt_t1, hyt_t2) {
+            return Math.hypot(hyt_t2.clientX - hyt_t1.clientX, hyt_t2.clientY - hyt_t1.clientY);
+        }
+
+        /**
+         * 函数功能描述：限制平移范围，1× 时强制居中，避免把图片拖出容器。
+         */
+        function hyt_clamp() {
+            if (hyt_scale <= 1) {
+                hyt_scale = 1;
+                hyt_tx = 0;
+                hyt_ty = 0;
+                return;
+            }
+            var hyt_maxX = (hyt_stage.clientWidth * hyt_scale - hyt_stage.clientWidth) / 2;
+            var hyt_maxY = (hyt_stage.clientHeight * hyt_scale - hyt_stage.clientHeight) / 2;
+            hyt_tx = Math.min(hyt_maxX, Math.max(-hyt_maxX, hyt_tx));
+            hyt_ty = Math.min(hyt_maxY, Math.max(-hyt_maxY, hyt_ty));
+        }
+
+        /**
+         * 函数功能描述：计算两根手指连线与水平线的夹角，供双指旋转使用。
+         * @param {Touch} hyt_t1 - 第一根手指
+         * @param {Touch} hyt_t2 - 第二根手指
+         * @returns {number} 弧度值
+         */
+        function hyt_angleOf(hyt_t1, hyt_t2) {
+            return Math.atan2(hyt_t2.clientY - hyt_t1.clientY, hyt_t2.clientX - hyt_t1.clientX);
+        }
+
+        /**
+         * 函数功能描述：把当前倍数、位移与旋转写进 transform，并同步右下角的读数。
+         * @param {boolean} hyt_withTransition - 是否播放 0.25s 过渡动画
+         */
+        function hyt_apply(hyt_withTransition) {
+            hyt_img.style.transition = hyt_withTransition ? 'transform .25s ease' : 'none';
+            hyt_img.style.transform = 'translate(' + hyt_tx + 'px, ' + hyt_ty + 'px) '
+                + 'rotate(' + hyt_rot + 'deg) scale(' + hyt_scale + ')';
+            hyt_hud.textContent = hyt_scale.toFixed(1) + '×'
+                + (Math.abs(hyt_rot) > 0.5 ? ' · ' + hyt_rot.toFixed(0) + '°' : '');
+        }
+
+        /**
+         * 函数功能描述：手指按下时区分单指拖动与双指缩放，并记录各自的起点状态。
+         * @param {TouchEvent} hyt_e - 触摸事件
+         */
+        function hyt_onStart(hyt_e) {
+            if (hyt_e.touches.length >= 2) {
+                hyt_hadPinch = true;
+                hyt_pinch = true;
+
+                var hyt_midClientX = (hyt_e.touches[0].clientX + hyt_e.touches[1].clientX) / 2;
+                var hyt_midClientY = (hyt_e.touches[0].clientY + hyt_e.touches[1].clientY) / 2;
+                var hyt_mid = hyt_centerOf(hyt_midClientX, hyt_midClientY);
+
+                hyt_startDist = hyt_dist(hyt_e.touches[0], hyt_e.touches[1]);
+                hyt_startScale = hyt_scale;
+                hyt_startTx = hyt_tx;
+                hyt_startTy = hyt_ty;
+                hyt_startMidX = hyt_mid.x;
+                hyt_startMidY = hyt_mid.y;
+                hyt_startAngle = hyt_angleOf(hyt_e.touches[0], hyt_e.touches[1]);
+                hyt_startRot = hyt_rot;
+            } else if (hyt_e.touches.length === 1) {
+                hyt_pinch = false;
+                hyt_hadPinch = false;
+
+                var hyt_c = hyt_centerOf(hyt_e.touches[0].clientX, hyt_e.touches[0].clientY);
+                hyt_tapX = hyt_c.x;
+                hyt_tapY = hyt_c.y;
+
+                hyt_dragStartX = hyt_e.touches[0].clientX;
+                hyt_dragStartY = hyt_e.touches[0].clientY;
+                hyt_dragTx = hyt_tx;
+                hyt_dragTy = hyt_ty;
+            }
+        }
+
+        /**
+         * 函数功能描述：双指时按两指距离比例缩放并保持两指中点不跳；单指且已放大时拖动图片。
+         * @param {TouchEvent} hyt_e - 触摸事件
+         */
+        function hyt_onMove(hyt_e) {
+            if (hyt_e.touches.length >= 2 && hyt_pinch && hyt_startDist > 0) {
+                var hyt_d = hyt_dist(hyt_e.touches[0], hyt_e.touches[1]);
+                var hyt_target = hyt_startScale * hyt_d / hyt_startDist;   // 未限制前的目标倍数
+                var hyt_s = Math.min(hyt_max, Math.max(hyt_min, hyt_target));  // 1～4 倍边界限制
+                var hyt_k = hyt_s / hyt_startScale;   // 相对手势起点的放大系数
+
+                var hyt_midClientX = (hyt_e.touches[0].clientX + hyt_e.touches[1].clientX) / 2;
+                var hyt_midClientY = (hyt_e.touches[0].clientY + hyt_e.touches[1].clientY) / 2;
+                var hyt_mid = hyt_centerOf(hyt_midClientX, hyt_midClientY);
+
+                hyt_scale = hyt_s;
+                // 手势开始时中点下的图片位置保持不变 → 缩放不跳
+                hyt_tx = hyt_mid.x - (hyt_startMidX - hyt_startTx) * hyt_k;
+                hyt_ty = hyt_mid.y - (hyt_startMidY - hyt_startTy) * hyt_k;
+
+                // 加分项：两指连线转多少度，图片就转多少度
+                var hyt_delta = hyt_angleOf(hyt_e.touches[0], hyt_e.touches[1]) - hyt_startAngle;
+                while (hyt_delta > Math.PI) { hyt_delta -= Math.PI * 2; }    // 绕过 180° 时归一化
+                while (hyt_delta < -Math.PI) { hyt_delta += Math.PI * 2; }
+                hyt_rot = hyt_startRot + hyt_delta * 180 / Math.PI;
+
+                hyt_clamp();
+                hyt_apply(false);
+                hyt_e.preventDefault();   // 阻止整页跟着放大
+            } else if (hyt_e.touches.length === 1 && hyt_scale > 1) {
+                if (hyt_pinch) {
+                    // 双指手势中途抬起一根手指：重置拖动起点，避免图片被"甩"走
+                    hyt_pinch = false;
+                    hyt_dragStartX = hyt_e.touches[0].clientX;
+                    hyt_dragStartY = hyt_e.touches[0].clientY;
+                    hyt_dragTx = hyt_tx;
+                    hyt_dragTy = hyt_ty;
+                    return;
+                }
+
+                // 已放大时，单指移动改为拖动查看细节
+                hyt_tx = hyt_dragTx + (hyt_e.touches[0].clientX - hyt_dragStartX);
+                hyt_ty = hyt_dragTy + (hyt_e.touches[0].clientY - hyt_dragStartY);
+                hyt_clamp();
+                hyt_apply(false);
+                hyt_e.preventDefault();
+            }
+        }
+
+        /**
+         * 函数功能描述：抬手后收回边界、判断双击，缩回 1× 时自动居中。
+         * @param {TouchEvent} hyt_e - 触摸事件
+         */
+        function hyt_onEnd(hyt_e) {
+            if (hyt_e.touches.length > 0) { return; }   // 还有手指在屏幕上，继续等
+
+            hyt_pinch = false;
+
+            // 双击判定：单指、未发生双指手势、位移很小
+            var hyt_t = hyt_e.changedTouches[0];
+            var hyt_c = hyt_centerOf(hyt_t.clientX, hyt_t.clientY);
+            var hyt_moved = Math.abs(hyt_c.x - hyt_tapX) + Math.abs(hyt_c.y - hyt_tapY);
+
+            if (!hyt_hadPinch && hyt_moved < 12) {
+                var hyt_now = Date.now();
+                if (hyt_now - hyt_lastTap < 280) {
+                    hyt_lastTap = 0;
+                    hyt_toggleZoom(hyt_tapX, hyt_tapY);
+                    return;
+                }
+                hyt_lastTap = hyt_now;
+            }
+
+            if (hyt_scale < 1.05) {   // 缩放不明显就复位并居中
+                hyt_scale = 1;
+                hyt_tx = 0;
+                hyt_ty = 0;
+                hyt_rot = 0;
+            }
+            hyt_clamp();
+            hyt_apply(true);
+        }
+
+        /**
+         * 函数功能描述：双击时在 1× 与 2× 之间切换，2× 以双击点为中心放大。
+         * @param {number} hyt_mx - 双击点相对容器中心的 X
+         * @param {number} hyt_my - 双击点相对容器中心的 Y
+         */
+        function hyt_toggleZoom(hyt_mx, hyt_my) {
+            if (hyt_scale > 1.01) {
+                hyt_scale = 1;
+                hyt_tx = 0;
+                hyt_ty = 0;
+                hyt_rot = 0;
+            } else {
+                var hyt_target = 2;
+                hyt_scale = hyt_target;
+                // t₁ = m - (m - t₀) × k，保证双击的位置放大后还在原处
+                hyt_tx = hyt_mx - (hyt_mx - 0) * hyt_target;
+                hyt_ty = hyt_my - (hyt_my - 0) * hyt_target;
+                hyt_clamp();
+            }
+            hyt_apply(true);
+        }
+
+        /**
+         * 函数功能描述：复位到 1× 且角度归零，带 0.25s 过渡。
+         */
+        function hyt_reset() {
+            hyt_scale = 1;
+            hyt_tx = 0;
+            hyt_ty = 0;
+            hyt_rot = 0;
+            hyt_apply(true);
+        }
+
+        hyt_stage.addEventListener('touchstart', hyt_onStart, { passive: true });
+        hyt_stage.addEventListener('touchmove', hyt_onMove, { passive: false });
+        hyt_stage.addEventListener('touchend', hyt_onEnd, { passive: true });
+        hyt_stage.addEventListener('touchcancel', function () {
+            // 被系统打断时同样收尾，避免缩放状态卡住
+            hyt_pinch = false;
+            hyt_clamp();
+            hyt_apply(true);
+        }, { passive: true });
+
+        document.getElementById('hyt_resetBtn').addEventListener('click', hyt_reset);
+
+        // 旋转屏幕后重新收边界，状态（倍数与位置）不丢失
+        window.addEventListener('resize', function () {
+            hyt_clamp();
+            hyt_apply(false);
+        });
+
+        hyt_apply(false);
+    </script>
+</body>
+</html>
