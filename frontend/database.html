@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--
+  姓名：【侯雨彤】 | 学号：【24002120119】 |
+  时间：2026-11-20 | 大模型：DeepSeek-V4.1-Flash
+  功能名称：数据库连接检测页，输入用户名密码测试 MySQL 连接并给出成功或错误提示
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库连接检测 · 侯雨彤</title>
+    <link rel="stylesheet" href="css/hyt_database.css">
+</head>
+<body>
+    <div class="hyt_glow hyt_glow--a"></div>
+    <div class="hyt_glow hyt_glow--b"></div>
+
+    <header class="hyt_head">
+        <span class="hyt_badge">数据库 · MySQL</span>
+        <h1>数据库连接检测</h1>
+        <p class="hyt_sub">输入用户名与密码，点击按钮测试后端能否连上 MySQL</p>
+        <div class="hyt_meta">
+            <span>姓名<b>侯雨彤</b></span>
+            <span>学号<b>24002120119</b></span>
+            <span>接口<b>POST /api/database/test</b></span>
+        </div>
+    </header>
+
+    <main class="hyt_main">
+        <form class="hyt_card" id="hyt_dbForm" autocomplete="off">
+            <label class="hyt_field">
+                <span class="hyt_label">用户名</span>
+                <input class="hyt_input" type="text" id="hyt_user" name="user" value="root" placeholder="请输入数据库用户名">
+            </label>
+
+            <label class="hyt_field">
+                <span class="hyt_label">密码</span>
+                <input class="hyt_input" type="password" id="hyt_password" name="password" value="hyt061123" placeholder="请输入数据库密码">
+            </label>
+
+            <div class="hyt_actions">
+                <button class="hyt_btn" type="submit" id="hyt_submitBtn">连接数据库</button>
+                <button class="hyt_btn hyt_btn--ghost" type="reset" id="hyt_resetBtn">重置</button>
+            </div>
+
+            <div class="hyt_tip" id="hyt_tip" role="status">等待连接…</div>
+
+            <dl class="hyt_detail hyt_hide" id="hyt_detail">
+                <div><dt>主机</dt><dd id="hyt_host">-</dd></div>
+                <div><dt>用户</dt><dd id="hyt_userOut">-</dd></div>
+                <div><dt>版本</dt><dd id="hyt_version">-</dd></div>
+                <div><dt>时间</dt><dd id="hyt_time">-</dd></div>
+            </dl>
+        </form>
+
+        <p class="hyt_back"><a href="/">← 返回项目首页</a></p>
+    </main>
+
+    <script src="js/hyt_database.js"></script>
+</body>
+</html>
