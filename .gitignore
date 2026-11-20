@@ -27,6 +27,7 @@ temp/
 
 # Env / secrets (never commit these)
 .env
+backend/.env
 .env.local
 .env.*.local
 

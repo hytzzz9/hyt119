@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--
+  姓名：【侯雨彤】 | 学号：【24002120119】 |
+  时间：2026-11-20 | 大模型：DeepSeek-V4.1-Flash
+  功能名称：项目首页，展示个人信息与全部已完成页面的导航入口（canvas 粒子背景）
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>侯雨彤 · 前端交互作品集</title>
+    <link rel="stylesheet" href="css/hyt_index.css">
+</head>
+<body>
+    <canvas id="hyt_bgCanvas" class="hyt_bgCanvas"></canvas>
+    <div class="hyt_glow hyt_glow--a"></div>
+    <div class="hyt_glow hyt_glow--b"></div>
+    <div class="hyt_glow hyt_glow--c"></div>
+
+    <header class="hyt_hero">
+        <span class="hyt_badge">课程作业 · 交互练习集</span>
+        <h1 class="hyt_title">侯雨彤的<span class="hyt_title-grad">前端交互作品集</span></h1>
+        <p class="hyt_sub">移动端手势 · 传感器 · 轮播特效 · 数据交互</p>
+
+        <div class="hyt_meta">
+            <span class="hyt_meta-item"><b>姓名</b>侯雨彤</span>
+            <span class="hyt_meta-item"><b>学号</b>24002120119</span>
+            <span class="hyt_meta-item"><b>项目名称</b>前端交互作品集</span>
+            <span class="hyt_meta-item"><b>项目类别</b>模仿 + 自选</span>
+        </div>
+    </header>
+
+    <main class="hyt_main">
+        <section class="hyt_section">
+            <div class="hyt_section-head">
+                <h2>移动端交互</h2>
+                <span class="hyt_section-tip">触摸事件 · 手势 · 传感器</span>
+            </div>
+            <div class="hyt_grid">
+                <a class="hyt_card" href="/legacy/mobile-events.html">
+                    <span class="hyt_card-no">01</span>
+                    <h3>事件侦探</h3>
+                    <p>记录触摸事件顺序、轨迹草图与实测记录表。</p>
+                    <span class="hyt_tag">touch 事件</span>
+                </a>
+                <a class="hyt_card" href="/legacy/mobile-gesture.html">
+                    <span class="hyt_card-no">02</span>
+                    <h3>手势卡片</h3>
+                    <p>左右滑动切换菜品卡片，带阈值与防误触冷却。</p>
+                    <span class="hyt_tag">滑动切换</span>
+                </a>
+                <a class="hyt_card" href="/legacy/mobile-zoom.html">
+                    <span class="hyt_card-no">03</span>
+                    <h3>图片查看器</h3>
+                    <p>双指缩放与旋转、双击放大、放大后拖动查看。</p>
+                    <span class="hyt_tag">多指手势</span>
+                </a>
+                <a class="hyt_card" href="/legacy/mobile-sensor.html">
+                    <span class="hyt_card-no">04</span>
+                    <h3>传感器互动</h3>
+                    <p>摇一摇抽菜谱 + 倾斜视差两个方案合一的页面。</p>
+                    <span class="hyt_tag">devicemotion</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="hyt_section">
+            <div class="hyt_section-head">
+                <h2>轮播与特效</h2>
+                <span class="hyt_section-tip">Swiper 七种切换效果</span>
+            </div>
+            <div class="hyt_grid hyt_grid--two">
+                <a class="hyt_card" href="/legacy/swiper-task.html">
+                    <span class="hyt_card-no">05</span>
+                    <h3>Swiper 轮播课堂任务</h3>
+                    <p>七种切换效果按钮、循环自动播放与圆点分页。</p>
+                    <span class="hyt_tag">Swiper</span>
+                </a>
+                <a class="hyt_card" href="/legacy/swiper-ai-dialogue.html">
+                    <span class="hyt_card-no">06</span>
+                    <h3>提示词迭代记录</h3>
+                    <p>记录与 AI 的两轮提示词、验证表格与答辩答复。</p>
+                    <span class="hyt_tag">过程记录</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="hyt_section">
+            <div class="hyt_section-head">
+                <h2>数据与接口</h2>
+                <span class="hyt_section-tip">本地服务 · JSON 数据</span>
+            </div>
+            <div class="hyt_grid hyt_grid--two">
+                <a class="hyt_card" href="/legacy/poems.html">
+                    <span class="hyt_card-no">07</span>
+                    <h3>诗词图文卡片</h3>
+                    <p>从本地 3004 端口的 db.json 读取诗词并渲染上图下文。</p>
+                    <span class="hyt_tag">fetch</span>
+                </a>
+                <a class="hyt_card" href="/legacy/index.html">
+                    <span class="hyt_card-no">08</span>
+                    <h3>旧版课堂实践中心</h3>
+                    <p>此前的课堂练习入口页，保留作过程记录。</p>
+                    <span class="hyt_tag">旧版</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="hyt_section">
+            <div class="hyt_section-head">
+                <h2>课堂基础练习</h2>
+                <span class="hyt_section-tip">语法 · 函数 · 图标 · 布局</span>
+            </div>
+            <div class="hyt_chips">
+                <a class="hyt_chip" href="/legacy/1.html">1.html</a>
+                <a class="hyt_chip" href="/legacy/text.html">text.html</a>
+                <a class="hyt_chip" href="/legacy/text1.html">text1.html</a>
+                <a class="hyt_chip" href="/legacy/dataType.html">dataType.html</a>
+                <a class="hyt_chip" href="/legacy/function005.html">function005.html</a>
+                <a class="hyt_chip" href="/legacy/function_apply.html">function_apply.html</a>
+                <a class="hyt_chip" href="/legacy/JS_boj_apply.html">JS_boj_apply.html</a>
+                <a class="hyt_chip" href="/legacy/svg005.html">svg005.html</a>
+                <a class="hyt_chip" href="/legacy/tab.html">tab.html</a>
+                <a class="hyt_chip" href="/legacy/iconfont-1.html">iconfont-1.html</a>
+                <a class="hyt_chip" href="/legacy/iconfont-2.html">iconfont-2.html</a>
+                <a class="hyt_chip" href="/legacy/iconfont-3.html">iconfont-3.html</a>
+                <a class="hyt_chip" href="/legacy/iconfont-4.html">iconfont-4.html</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="hyt_footer">
+        本地服务端口 8119 · 接口前缀 /api · 后端 Express + MySQL
+    </footer>
+
+    <script src="js/hyt_index.js"></script>
+</body>
+</html>

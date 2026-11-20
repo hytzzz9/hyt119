@@ -102,6 +102,21 @@
             border: 1px solid #e5e7eb;
         }
 
+        .hyt_env { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+
+        .hyt_env_item {
+            flex: 1 1 46%;
+            background: #f6f8fb;
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 12.5px;
+            color: #33415c;
+        }
+
+        .hyt_env_item b { color: #1f2328; }
+
+        .hyt_table tbody tr:nth-child(even) { background: #fafbfd; }
+
         .hyt_table { width: 100%; border-collapse: collapse; font-size: 13px; display: block; overflow-x: auto; }
         .hyt_table th, .hyt_table td { border: 1px solid #e5e7eb; padding: 8px 10px; text-align: left; vertical-align: top; }
         .hyt_table th { background: #f3f5f9; font-weight: 600; white-space: nowrap; }
@@ -124,16 +139,19 @@
 
         <section class="hyt_panel">
             <h2>探针区</h2>
+            <div class="hyt_env" id="hyt_env"></div>
             <div class="hyt_probe" id="hyt_probe">
                 在此按下 / 拖动 / 双指 / 长按<br>事件会实时记录到下面
             </div>
             <div class="hyt_btns">
-                <button class="hyt_btn" id="hyt_clearBtn" type="button">清空日志与轨迹</button>
+                <button class="hyt_btn" id="hyt_clearBtn" type="button">清空</button>
+                <button class="hyt_btn" id="hyt_copyBtn" type="button">复制实测记录</button>
+                <button class="hyt_btn" id="hyt_cancelBtn" type="button">模拟 touchcancel</button>
             </div>
             <ul class="hyt_log" id="hyt_log"></ul>
             <div class="hyt_stat" id="hyt_stat">本次手势 touchmove：0 次</div>
             <canvas class="hyt_canvas" id="hyt_canvas" width="640" height="280"></canvas>
-            <div class="hyt_stat">↑ 轨迹草图：拖动时按真实坐标连线，用于说明手指的实际路径</div>
+            <div class="hyt_stat">↑ 轨迹草图：绿点为起点、红点为终点，按真实坐标连线，用于说明手指的实际路径</div>
         </section>
 
         <section class="hyt_panel">
@@ -185,6 +203,22 @@
             <div class="hyt_stat">说明：touchmove 次数随设备刷新率与拖动时长波动，表中为设备模式下的典型区间，你在自己手机上测会略有差异。</div>
         </section>
 
+        <section class="hyt_panel">
+            <h2>实测记录（每次操作自动写入）</h2>
+            <table class="hyt_table">
+                <tr>
+                    <th>手势</th>
+                    <th>事件顺序</th>
+                    <th>touchmove</th>
+                    <th>时长</th>
+                    <th>位移</th>
+                    <th>补发 click</th>
+                </tr>
+                <tbody id="hyt_records"></tbody>
+            </table>
+            <div class="hyt_stat">↑ 每完成一次操作就自动新增一行；点「复制实测记录」可直接粘贴进作业文档。</div>
+        </section>
+
         <section class="hyt_panel hyt_qa">
             <h2>验收三问</h2>
             <dl>
@@ -195,7 +229,7 @@
                 <dd><b>之后</b>。顺序是 touchstart → touchend → click，而且只有在位移很小（没有被判定为滑动）时浏览器才会补发 click。</dd>
 
                 <dt>③ 如果把 touchend 换成 touchcancel，会发生什么？</dt>
-                <dd>正常抬手<b>不会</b>触发 touchcancel——它只在系统打断时出现（来电、通知、浏览器接管手势、手势越界）。如果把收尾逻辑只写在 touchend，被打断时就不会执行，状态会卡住（拖动标记不清、长按定时器不清理）。正确做法是<b>两者绑定同一个收尾函数</b>。</dd>
+                <dd>正常抬手<b>不会</b>触发 touchcancel——它只在系统打断时出现（来电、通知、浏览器接管手势、手势越界）。如果把收尾逻辑只写在 touchend，被打断时就不会执行，状态会卡住（拖动标记不清、长按定时器不清理）。正确做法是<b>两者绑定同一个收尾函数</b>。本页的 <code>hyt_onTouchCancel</code> 与 <code>hyt_onTouchEnd</code> 都走 <code>hyt_finishGesture</code>，可点上面的「模拟 touchcancel」按钮验证：记录表里会多出一行"被系统打断"。</dd>
             </dl>
         </section>
 
@@ -214,6 +248,19 @@
         var hyt_longTimer = null;
         var hyt_longFired = false;
         var hyt_lastPoint = null;
+
+        // 手势状态：用于自动生成"实测记录"
+        var hyt_active = false;      // 是否正处于一次手势中
+        var hyt_startMs = 0;         // 手势开始时刻
+        var hyt_startX = 0;
+        var hyt_startY = 0;
+        var hyt_endX = 0;
+        var hyt_endY = 0;
+        var hyt_maxTouches = 0;      // 本次手势最多几根手指
+        var hyt_lastRow = null;      // 最近一行记录，click 到来时用来补"有"
+
+        var hyt_envEl = document.getElementById('hyt_env');
+        var hyt_recordsEl = document.getElementById('hyt_records');
 
         /**
          * 函数功能描述：把一条触摸事件写入实时日志，显示相对时间、事件名与关键信息。
@@ -249,6 +296,14 @@
                 hyt_ctx.moveTo(hyt_lastPoint.x, hyt_lastPoint.y);
                 hyt_ctx.lineTo(hyt_x, hyt_y);
                 hyt_ctx.stroke();
+            } else {
+                // 第一个点画成绿色起点
+                hyt_ctx.fillStyle = '#16a34a';
+                hyt_ctx.beginPath();
+                hyt_ctx.arc(hyt_x, hyt_y, 4, 0, Math.PI * 2);
+                hyt_ctx.fill();
+                hyt_ctx.font = '11px sans-serif';
+                hyt_ctx.fillText('起点', hyt_x + 7, hyt_y - 7);
             }
             hyt_ctx.fillStyle = '#c2410c';
             hyt_ctx.beginPath();
@@ -263,10 +318,13 @@
          */
         function hyt_resetLog() {
             hyt_logList.innerHTML = '';
+            hyt_recordsEl.innerHTML = '';
             hyt_ctx.clearRect(0, 0, hyt_canvas.width, hyt_canvas.height);
             hyt_t0 = 0;
             hyt_moveCount = 0;
             hyt_lastPoint = null;
+            hyt_active = false;
+            hyt_lastRow = null;
             hyt_stat.textContent = '本次手势 touchmove：0 次';
             clearTimeout(hyt_longTimer);
         }
@@ -276,12 +334,23 @@
          * @param {TouchEvent} hyt_e - 触摸事件对象
          */
         function hyt_onTouchStart(hyt_e) {
-            hyt_moveCount = 0;
-            hyt_longFired = false;
-            hyt_lastPoint = null;
+            var hyt_t = hyt_e.touches[0];
+            hyt_maxTouches = Math.max(hyt_maxTouches, hyt_e.touches.length);
+
+            if (!hyt_active) {           // 第一根手指按下 → 开启一次新手势
+                hyt_active = true;
+                hyt_moveCount = 0;
+                hyt_longFired = false;
+                hyt_lastPoint = null;
+                hyt_startMs = Date.now();
+                hyt_startX = hyt_t.clientX;
+                hyt_startY = hyt_t.clientY;
+                hyt_endX = hyt_startX;
+                hyt_endY = hyt_startY;
+            }
 
             hyt_log('touchstart', 'touches.length=' + hyt_e.touches.length
-                + ' (' + Math.round(hyt_e.touches[0].clientX) + ', ' + Math.round(hyt_e.touches[0].clientY) + ')');
+                + ' (' + Math.round(hyt_t.clientX) + ', ' + Math.round(hyt_t.clientY) + ')');
 
             clearTimeout(hyt_longTimer);
             hyt_longTimer = setTimeout(function () {
@@ -296,14 +365,18 @@
          */
         function hyt_onTouchMove(hyt_e) {
             hyt_moveCount++;
+            hyt_maxTouches = Math.max(hyt_maxTouches, hyt_e.touches.length);
 
             var hyt_t = hyt_e.touches[0];
+            hyt_endX = hyt_t.clientX;
+            hyt_endY = hyt_t.clientY;
             hyt_tracePoint(hyt_t.clientX, hyt_t.clientY);
 
             if (hyt_moveCount === 1 || hyt_moveCount % 10 === 0) {
-                hyt_log('touchmove ×' + hyt_moveCount, '(' + Math.round(hyt_t.clientX) + ', ' + Math.round(hyt_t.clientY) + ')');
+                hyt_log('touchmove ×' + hyt_moveCount, '(' + Math.round(hyt_t.clientX) + ', ' + Math.round(hyt_t.clientY) + ')'
+                    + '，手指 ' + hyt_e.touches.length + ' 根');
             }
-            hyt_stat.textContent = '本次手势 touchmove：' + hyt_moveCount + ' 次';
+            hyt_stat.textContent = '本次手势 touchmove：' + hyt_moveCount + ' 次 · 手指 ' + hyt_e.touches.length + ' 根';
         }
 
         /**
@@ -320,14 +393,150 @@
             if (hyt_longFired) {
                 hyt_log('（提示）长按已触发过，顺序是 长按回调 → touchend → click', '');
             }
+
+            // 双指时先抬起的那根不算结束，等最后一根离手再结算
+            if (hyt_e.touches.length === 0) {
+                hyt_finishGesture('touchend');
+            }
         }
 
         /**
-         * 函数功能描述：系统打断手势时清理定时器并记录 touchcancel。
+         * 函数功能描述：系统打断手势时记录 touchcancel，并走与 touchend 相同的收尾函数。
          */
         function hyt_onTouchCancel() {
-            clearTimeout(hyt_longTimer);
             hyt_log('touchcancel', '（系统打断：来电 / 通知 / 浏览器接管手势）');
+            hyt_finishGesture('touchcancel');
+        }
+
+        /**
+         * 函数功能描述：判断位移的主方向，用于给"快速滑"命名。
+         * @param {number} hyt_dx - 横向位移
+         * @param {number} hyt_dy - 纵向位移
+         * @returns {string} 方向文字
+         */
+        function hyt_direction(hyt_dx, hyt_dy) {
+            if (Math.abs(hyt_dx) >= Math.abs(hyt_dy)) {
+                return hyt_dx < 0 ? '向左' : '向右';
+            }
+            return hyt_dy < 0 ? '向上' : '向下';
+        }
+
+        /**
+         * 函数功能描述：手势结束时结算时长、位移、次数并推断手势类型，自动往"实测记录"追加一行。
+         * @param {string} hyt_type - 'touchend' 或 'touchcancel'
+         */
+        function hyt_finishGesture(hyt_type) {
+            clearTimeout(hyt_longTimer);
+            if (!hyt_active) { return; }
+            hyt_active = false;
+
+            var hyt_dur = Date.now() - hyt_startMs;
+            var hyt_dx = hyt_endX - hyt_startX;
+            var hyt_dy = hyt_endY - hyt_startY;
+            var hyt_dist = Math.round(Math.sqrt(hyt_dx * hyt_dx + hyt_dy * hyt_dy));
+
+            var hyt_name;
+            if (hyt_type === 'touchcancel') {
+                hyt_name = '被系统打断';
+            } else if (hyt_maxTouches >= 2) {
+                hyt_name = '双指触摸';
+            } else if (hyt_longFired) {
+                hyt_name = '长按后抬起';
+            } else if (hyt_moveCount < 3 && hyt_dist < 12) {
+                hyt_name = '单击';
+            } else if (hyt_dur < 400 && hyt_dist > 60) {
+                hyt_name = '快速滑（' + hyt_direction(hyt_dx, hyt_dy) + '）';
+            } else {
+                hyt_name = '拖动';
+            }
+
+            var hyt_seqText = 'touchstart'
+                + (hyt_maxTouches >= 2 ? ' ×2' : '')
+                + (hyt_moveCount > 0 ? ' → touchmove ×' + hyt_moveCount : '')
+                + (hyt_longFired ? ' → 长按回调' : '')
+                + ' → ' + hyt_type;
+
+            var hyt_tr = document.createElement('tr');
+            hyt_tr.innerHTML = '<td>' + hyt_name + '</td>'
+                + '<td>' + hyt_seqText + '</td>'
+                + '<td>' + hyt_moveCount + '</td>'
+                + '<td>' + hyt_dur + 'ms</td>'
+                + '<td>' + hyt_dist + 'px</td>'
+                + '<td>未补发</td>';
+            hyt_recordsEl.appendChild(hyt_tr);
+            hyt_lastRow = hyt_tr;
+
+            hyt_stat.textContent = '已记录：' + hyt_name + ' · ' + hyt_seqText;
+        }
+
+        /**
+         * 函数功能描述：填充视口尺寸、像素比、触点数等环境信息，证明当前确实是移动端环境。
+         */
+        function hyt_fillEnv() {
+            var hyt_items = [
+                ['视口', window.innerWidth + ' × ' + window.innerHeight + ' px'],
+                ['像素比 DPR', window.devicePixelRatio],
+                ['最大触点数', navigator.maxTouchPoints || 0],
+                ['触摸事件', ('ontouchstart' in window) ? '支持' : '不支持（桌面浏览器）']
+            ];
+
+            hyt_envEl.innerHTML = '';
+            for (var hyt_i = 0; hyt_i < hyt_items.length; hyt_i++) {
+                var hyt_div = document.createElement('div');
+                hyt_div.className = 'hyt_env_item';
+                hyt_div.innerHTML = '<b>' + hyt_items[hyt_i][0] + '</b><br>' + hyt_items[hyt_i][1];
+                hyt_envEl.appendChild(hyt_div);
+            }
+        }
+
+        /**
+         * 函数功能描述：模拟系统打断，验证收尾逻辑与 touchend 共用也能正常结算。
+         */
+        function hyt_simulateCancel() {
+            if (!hyt_active) {
+                hyt_active = true;
+                hyt_startMs = Date.now();
+                hyt_startX = 0;
+                hyt_startY = 0;
+                hyt_endX = 0;
+                hyt_endY = 0;
+                hyt_moveCount = 0;
+                hyt_maxTouches = 1;
+                hyt_longFired = false;
+            }
+            hyt_log('touchcancel', '（模拟：来电 / 通知 / 浏览器接管手势）');
+            hyt_finishGesture('touchcancel');
+        }
+
+        /**
+         * 函数功能描述：把实测记录导出为制表符分隔文本，方便直接粘贴进作业。
+         */
+        function hyt_copyRecords() {
+            if (!hyt_recordsEl.children.length) {
+                hyt_stat.textContent = '还没有实测记录，先在探针区做一次操作';
+                return;
+            }
+
+            var hyt_lines = ['手势\t事件顺序\ttouchmove\t时长\t位移\t补发click'];
+            for (var hyt_i = 0; hyt_i < hyt_recordsEl.children.length; hyt_i++) {
+                var hyt_cells = hyt_recordsEl.children[hyt_i].cells;
+                var hyt_cellsText = [];
+                for (var hyt_j = 0; hyt_j < hyt_cells.length; hyt_j++) {
+                    hyt_cellsText.push(hyt_cells[hyt_j].textContent);
+                }
+                hyt_lines.push(hyt_cellsText.join('\t'));
+            }
+
+            var hyt_text = hyt_lines.join('\n');
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(hyt_text).then(function () {
+                    hyt_stat.textContent = '已复制 ' + (hyt_lines.length - 1) + ' 条实测记录';
+                }).catch(function () {
+                    hyt_stat.textContent = '复制失败，请长按表格手动选择';
+                });
+            } else {
+                hyt_stat.textContent = '当前浏览器不支持自动复制，请长按表格手动选择';
+            }
         }
 
         hyt_probe.addEventListener('touchstart', hyt_onTouchStart, { passive: true });
@@ -338,9 +547,19 @@
         // 触摸后浏览器补发的 click，用来验证"click 在 touchend 之后"
         hyt_probe.addEventListener('click', function () {
             hyt_log('click', '（浏览器在 touchend 之后才补发）');
+
+            // 把"补发 click"写回最近一行实测记录
+            if (hyt_lastRow && hyt_lastRow.cells.length > 5) {
+                hyt_lastRow.cells[5].textContent = '有（touchend 之后）';
+                hyt_lastRow = null;
+            }
         });
 
         document.getElementById('hyt_clearBtn').addEventListener('click', hyt_resetLog);
+        document.getElementById('hyt_copyBtn').addEventListener('click', hyt_copyRecords);
+        document.getElementById('hyt_cancelBtn').addEventListener('click', hyt_simulateCancel);
+
+        hyt_fillEnv();
     </script>
 </body>
 </html>

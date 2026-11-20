@@ -112,10 +112,200 @@
         .hyt_back { text-align: center; font-size: 13px; margin-top: 18px; }
         .hyt_back a { color: #7cb0ff; text-decoration: none; }
     </style>
+    <style>
+        /* ================= 可爱主题（覆盖层） ================= */
+        body {
+            color: #5a4350;
+            font-family: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+            background:
+                radial-gradient(720px 520px at 4% -6%, #ffe0ec 0%, rgba(255, 224, 236, 0) 62%),
+                radial-gradient(680px 520px at 100% 2%, #d9ecff 0%, rgba(217, 236, 255, 0) 62%),
+                radial-gradient(700px 560px at 50% 112%, #dcfaee 0%, rgba(220, 250, 238, 0) 58%),
+                #fffaf6;
+            background-attachment: fixed;
+        }
+
+        .hyt_head { text-align: center; padding-top: 4px; }
+
+        .hyt_eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11.5px;
+            letter-spacing: 1.5px;
+            color: #e0567a;
+            background: #fff;
+            border: 2px solid #ffd3e0;
+            padding: 5px 13px;
+            border-radius: 999px;
+            box-shadow: 0 6px 14px rgba(255, 140, 170, .18);
+            transform: rotate(-1.5deg);
+        }
+
+        .hyt_eyebrow::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #ff6f91;
+        }
+
+        .hyt_head h1 {
+            margin: 15px 0 9px;
+            font-size: 27px;
+            letter-spacing: 1px;
+            color: #6b4a5f;
+            background: none;
+            -webkit-background-clip: border-box;
+            background-clip: border-box;
+            -webkit-text-fill-color: #6b4a5f;
+            text-shadow: 0 2px 0 #fff, 0 10px 22px rgba(255, 160, 190, .35);
+        }
+
+        .hyt_head p { color: #8d7786; font-size: 12.5px; line-height: 1.9; }
+
+        /* 相册卡片：白色相框 + 两枚和纸胶带 */
+        .hyt_viewer {
+            border: 6px solid #fff;
+            border-radius: 26px;
+            background: #fff;
+            box-shadow:
+                0 18px 40px rgba(255, 150, 175, .26),
+                0 0 0 3px #ffe3ec;
+        }
+
+        .hyt_viewer::before,
+        .hyt_viewer::after {
+            content: '';
+            position: absolute;
+            width: 74px;
+            height: 21px;
+            background: rgba(255, 190, 150, .55);
+            border: 1px dashed rgba(255, 255, 255, .95);
+            border-radius: 4px;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .hyt_viewer::before { top: 12px; left: 12px; transform: rotate(-8deg); }
+        .hyt_viewer::after { top: 12px; right: 12px; transform: rotate(6deg); background: rgba(150, 200, 255, .55); }
+
+        /* 右下角读数做成贴纸 */
+        .hyt_hud {
+            background: rgba(255, 255, 255, .94);
+            color: #e0567a;
+            border: 2px dashed #ffc7dd;
+            border-radius: 999px;
+            font-weight: 600;
+            padding: 4px 10px;
+            transform: rotate(-2deg);
+            box-shadow: 0 6px 14px rgba(255, 150, 175, .2);
+        }
+
+        /* 糖果按钮 */
+        .hyt_btn {
+            border-radius: 999px;
+            background: #fff;
+            color: #e0567a;
+            font-weight: 600;
+            border: 2px solid #ffd3e0;
+            box-shadow: 0 6px 0 #ffe4ec;
+            transition: transform .12s ease, box-shadow .12s ease;
+        }
+
+        .hyt_btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #ffe4ec; }
+
+        /* 要求对照：白色便签 */
+        .hyt_check {
+            background: #fff;
+            border: 2px dashed #ffd7e3;
+            border-radius: 22px;
+            box-shadow: 0 12px 26px rgba(255, 170, 195, .18);
+            color: #7b6874;
+        }
+
+        .hyt_check h2 { color: #6b4a5f; }
+
+        .hyt_check li { border-bottom: 1.5px dashed #ffe9f0; }
+
+        .hyt_check li b { color: #ff6f91; }
+
+        .hyt_check code {
+            background: #fff3f7;
+            color: #e0567a;
+            padding: 1px 6px;
+            border-radius: 6px;
+        }
+
+        /* 说明区：薄荷便签 */
+        .hyt_note {
+            background: #fff;
+            border: 2px solid #ddf5eb;
+            border-radius: 22px;
+            box-shadow: 0 12px 26px rgba(130, 220, 190, .16);
+            color: #7b6874;
+        }
+
+        .hyt_note h2 { color: #3f9d80; }
+
+        .hyt_note code {
+            background: #eefaf5;
+            color: #3f9d80;
+            padding: 1px 6px;
+            border-radius: 6px;
+        }
+
+        /* 底部胶囊 */
+        .hyt_back a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            color: #e0567a;
+            text-decoration: none;
+            background: #fff;
+            border: 2px solid #ffd3e0;
+            box-shadow: 0 5px 0 #ffe4ec;
+        }
+
+        .hyt_back a:active { transform: translateY(3px); box-shadow: 0 2px 0 #ffe4ec; }
+
+        /* 演示视频卡片 */
+        .hyt_videoCard {
+            margin-top: 18px;
+            padding: 16px 16px 14px;
+            background: #fff;
+            border: 2px solid #ffe3ec;
+            border-radius: 22px;
+            box-shadow: 0 12px 26px rgba(255, 170, 195, .16);
+        }
+
+        .hyt_videoCard h2 {
+            font-size: 13.5px;
+            color: #6b4a5f;
+            margin-bottom: 12px;
+            letter-spacing: .3px;
+        }
+
+        .hyt_videoFrame {
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06);
+        }
+
+        .hyt_video { display: block; width: 100%; height: auto; }
+
+        @media (max-width: 360px) {
+            .hyt_head h1 { font-size: 23px; }
+        }
+    </style>
 </head>
 <body>
     <div class="hyt_wrap">
         <header class="hyt_head">
+            <span class="hyt_eyebrow">任务三 · 图片查看器</span>
             <h1>图片查看器</h1>
             <p>双指缩放请用手机打开（1×～4×）· 转动两指可旋转 · 双击在 1× / 2× 之间切换 · 放大后单指拖动查看细节</p>
         </header>
@@ -128,6 +318,13 @@
         <div class="hyt_ops">
             <button class="hyt_btn" id="hyt_resetBtn" type="button">复位到 1×（角度归零）</button>
         </div>
+
+        <section class="hyt_videoCard">
+            <h2>真机演示：双指缩放 · 旋转 · 双击 · 拖动 · 复位</h2>
+            <div class="hyt_videoFrame">
+                <video class="hyt_video" src="任务三.mp4" controls playsinline preload="metadata"></video>
+            </div>
+        </section>
 
         <section class="hyt_check">
             <h2>任务三 · 七步要求与四条验收（全部在本页）</h2>
