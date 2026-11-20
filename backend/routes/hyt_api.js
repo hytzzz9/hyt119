@@ -7,6 +7,8 @@
 const express = require('express');
 const hyt_healthController = require('../controllers/hyt_healthController');
 const hyt_databaseController = require('../controllers/hyt_databaseController');
+const hyt_newsController = require('../controllers/hyt_newsController');
+const hyt_galleryController = require('../controllers/hyt_galleryController');
 
 const hyt_router = express.Router();
 
@@ -15,5 +17,11 @@ hyt_router.get('/health', hyt_healthController.hyt_health);
 
 /* 数据库连接测试：POST /api/database/test */
 hyt_router.post('/database/test', hyt_databaseController.hyt_testDatabase);
+
+/* 科技新闻列表：GET /api/news */
+hyt_router.get('/news', hyt_newsController.hyt_listNews);
+
+/* 图文列表：GET /api/gallery */
+hyt_router.get('/gallery', hyt_galleryController.hyt_listGallery);
 
 module.exports = hyt_router;

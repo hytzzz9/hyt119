@@ -24,6 +24,7 @@ yarn-debug.log*
 .cache/
 .tmp/
 temp/
+.screenshots/
 
 # Env / secrets (never commit these)
 .env

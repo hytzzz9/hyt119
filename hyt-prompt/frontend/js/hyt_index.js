@@ -153,6 +153,19 @@ function hyt_onVisibility() {
 }
 
 /**
+ * 函数功能描述：双击直接打开页面（file://）时，把 /legacy/xxx 绝对链接改写为指向项目根目录的相对链接，避免点击后 404。
+ */
+function hyt_fixLegacyLinks() {
+    if (location.protocol !== 'file:') return;
+
+    const hyt_links = document.querySelectorAll('a[href^="/legacy/"]');
+
+    hyt_links.forEach(function (hyt_a) {
+        hyt_a.setAttribute('href', '../../' + hyt_a.getAttribute('href').slice('/legacy/'.length));
+    });
+}
+
+/**
  * 函数功能描述：初始化画布尺寸、监听事件并启动动画（减弱动效时仅绘制静态一帧）。
  */
 function hyt_init() {
@@ -171,4 +184,5 @@ function hyt_init() {
     hyt_rafId = requestAnimationFrame(hyt_loop);
 }
 
+hyt_fixLegacyLinks();
 hyt_init();

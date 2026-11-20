@@ -13,12 +13,14 @@
 
 ```
 .
-├── frontend/                 # 前端（原生 HTML / CSS / JS，无第三方库）
-│   ├── index.html            # 项目首页（canvas 粒子背景 + 页面导航）
-│   ├── css/hyt_index.css
-│   ├── js/hyt_index.js
-│   ├── fonts/                # iconfont 图标（如有）
-│   └── images/
+├── hyt-prompt/               # 课程项目目录
+│   ├── AGENTS.md             # 项目规则
+│   └── frontend/             # 前端（原生 HTML / CSS / JS，无第三方库）
+│       ├── index.html        # 项目首页（canvas 粒子背景 + 页面导航）
+│       ├── css/hyt_index.css
+│       ├── js/hyt_index.js
+│       ├── fonts/            # iconfont 图标（如有）
+│       └── images/
 ├── backend/                  # 后端 Node.js + Express（端口 8119，接口前缀 /api）
 │   ├── server.js
 │   ├── config/hyt_db.js

@@ -10,6 +10,14 @@ echo   URL: http://localhost:8119
 echo ==========================================
 echo.
 
+netstat -ano | findstr "LISTENING" | findstr ":8119" >nul 2>&1
+if %errorlevel%==0 (
+    echo [hyt] Server already running on port 8119, opening browser ...
+    start "" http://localhost:8119/
+    timeout /t 3 >nul
+    exit /b 0
+)
+
 if not exist node_modules (
     echo [hyt] Dependencies not found, running npm install...
     call npm install
@@ -24,6 +32,7 @@ if not exist .env (
 )
 
 echo [hyt] Starting server ...
+start "" /b powershell -NoProfile -WindowStyle Hidden -Command "Start-Sleep -Seconds 3; Start-Process 'http://localhost:8119/'"
 node server.js
 
 echo.

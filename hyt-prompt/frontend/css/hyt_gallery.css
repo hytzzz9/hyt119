@@ -1,0 +1,294 @@
+/**
+ * 姓名：【侯雨彤】 | 学号：【24002120119】 |
+ * 时间：2026-11-20 | 大模型：DeepSeek-V4.1-Flash
+ *
+ * 图文列表页样式：奶油底色 + 双列图文卡片
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --hyt_bg: #f6f1e7;
+    --hyt_paper: #fffdf8;
+    --hyt_ink: #23262f;
+    --hyt_muted: #767b8a;
+    --hyt_line: rgba(35, 38, 47, .12);
+    --hyt_accent: #d97757;
+    --hyt_accent-soft: rgba(217, 119, 87, .12);
+    --hyt_green: #4f7d6b;
+}
+
+body {
+    min-height: 100vh;
+    background:
+        radial-gradient(760px 420px at 8% -6%, rgba(217, 119, 87, .18), transparent 62%),
+        radial-gradient(720px 460px at 96% 4%, rgba(79, 125, 107, .16), transparent 60%),
+        var(--hyt_bg);
+    color: var(--hyt_ink);
+    font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+    line-height: 1.65;
+    overflow-x: hidden;
+}
+
+.hyt_head,
+.hyt_main,
+.hyt_footer {
+    max-width: 1040px;
+    margin: 0 auto;
+}
+
+.hyt_head {
+    padding: 66px 24px 8px;
+}
+
+.hyt_badge {
+    display: inline-block;
+    padding: 5px 14px;
+    border: 1px solid rgba(217, 119, 87, .35);
+    border-radius: 999px;
+    background: var(--hyt_accent-soft);
+    color: var(--hyt_accent);
+    font-size: 11.5px;
+    letter-spacing: 3px;
+}
+
+.hyt_head h1 {
+    margin-top: 16px;
+    font-family: "Songti SC", "SimSun", Georgia, serif;
+    font-size: clamp(26px, 4.4vw, 38px);
+    letter-spacing: 2px;
+}
+
+.hyt_sub {
+    margin-top: 8px;
+    color: var(--hyt_muted);
+    font-size: 13.5px;
+}
+
+.hyt_sub code {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(79, 125, 107, .12);
+    color: var(--hyt_green);
+    font-size: 12.5px;
+}
+
+.hyt_meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+    font-size: 12.5px;
+}
+
+.hyt_meta span {
+    display: inline-flex;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid var(--hyt_line);
+    border-radius: 10px;
+    background: rgba(255, 253, 248, .8);
+    color: var(--hyt_muted);
+}
+
+.hyt_meta b {
+    color: var(--hyt_ink);
+    font-weight: 600;
+}
+
+.hyt_main {
+    padding: 22px 24px 40px;
+}
+
+.hyt_apiBar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1px solid var(--hyt_line);
+    border-radius: 14px;
+    background: rgba(255, 253, 248, .88);
+    box-shadow: 0 8px 24px rgba(35, 38, 47, .05);
+}
+
+.hyt_apiInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.hyt_apiMethod {
+    padding: 3px 9px;
+    border-radius: 7px;
+    background: var(--hyt_accent-soft);
+    border: 1px solid rgba(217, 119, 87, .3);
+    color: var(--hyt_accent);
+    font-size: 11.5px;
+    letter-spacing: 1px;
+}
+
+.hyt_apiLink {
+    color: var(--hyt_ink);
+    font-size: 14px;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(217, 119, 87, .5);
+    word-break: break-all;
+}
+
+.hyt_apiLink:hover {
+    color: var(--hyt_accent);
+}
+
+.hyt_apiSide {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.hyt_apiCount {
+    color: var(--hyt_muted);
+    font-size: 12.5px;
+}
+
+.hyt_btn {
+    padding: 8px 16px;
+    border: 1px solid var(--hyt_line);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--hyt_ink);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color .2s, color .2s, transform .18s;
+}
+
+.hyt_btn:hover {
+    border-color: rgba(217, 119, 87, .45);
+    color: var(--hyt_accent);
+    transform: translateY(-1px);
+}
+
+.hyt_btn:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.hyt_tip {
+    margin: 14px 2px 8px;
+    color: var(--hyt_muted);
+    font-size: 13px;
+}
+
+.hyt_tip.is-bad {
+    color: #c2413a;
+}
+
+.hyt_grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.hyt_card {
+    overflow: hidden;
+    border: 1px solid var(--hyt_line);
+    border-radius: 18px;
+    background: var(--hyt_paper);
+    box-shadow: 0 10px 30px rgba(35, 38, 47, .06);
+    transition: transform .28s, box-shadow .28s;
+}
+
+.hyt_card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 38px rgba(35, 38, 47, .12);
+}
+
+.hyt_thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #e7e1d6;
+}
+
+.hyt_thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .5s ease;
+}
+
+.hyt_card:hover .hyt_thumb img {
+    transform: scale(1.05);
+}
+
+.hyt_place {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(20, 22, 28, .55);
+    color: #fff;
+    font-size: 11.5px;
+    letter-spacing: .5px;
+    backdrop-filter: blur(6px);
+}
+
+.hyt_body {
+    padding: 15px 17px 17px;
+}
+
+.hyt_cardTitle {
+    font-family: "Songti SC", "SimSun", Georgia, serif;
+    font-size: 17px;
+    letter-spacing: .5px;
+}
+
+.hyt_desc {
+    margin-top: 6px;
+    color: var(--hyt_muted);
+    font-size: 13.5px;
+}
+
+.hyt_time {
+    display: block;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--hyt_line);
+    color: rgba(118, 123, 138, .9);
+    font-size: 12px;
+}
+
+.hyt_footer {
+    padding: 8px 24px 46px;
+    font-size: 13px;
+}
+
+.hyt_footer a {
+    color: var(--hyt_muted);
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.hyt_footer a:hover {
+    color: var(--hyt_accent);
+}
+
+@media (max-width: 720px) {
+    .hyt_grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hyt_head {
+        padding-top: 48px;
+    }
+}

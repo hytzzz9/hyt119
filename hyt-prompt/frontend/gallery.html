@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!--
+  姓名：【侯雨彤】 | 学号：【24002120119】 |
+  时间：2026-11-20 | 大模型：DeepSeek-V4.1-Flash
+  功能名称：图文列表页，展示后端接口地址与数据库中的图文数据
+-->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图文列表 · 侯雨彤</title>
+    <link rel="stylesheet" href="css/hyt_gallery.css">
+</head>
+<body>
+    <header class="hyt_head">
+        <span class="hyt_badge">图 文 列 表</span>
+        <h1>旅途中的八帧光影</h1>
+        <p class="hyt_sub">图片与图说来自数据库表 <code>hyt_gallery</code>，由后端接口返回</p>
+        <div class="hyt_meta">
+            <span>姓名<b>侯雨彤</b></span>
+            <span>学号<b>24002120119</b></span>
+            <span>数据表<b>hyt_gallery</b></span>
+        </div>
+    </header>
+
+    <main class="hyt_main">
+        <section class="hyt_apiBar">
+            <div class="hyt_apiInfo">
+                <span class="hyt_apiMethod">GET</span>
+                <a class="hyt_apiLink" id="hyt_apiLink" href="/api/gallery" target="_blank" rel="noopener">/api/gallery</a>
+            </div>
+            <div class="hyt_apiSide">
+                <span class="hyt_apiCount" id="hyt_apiCount">共 -- 条</span>
+                <button class="hyt_btn" type="button" id="hyt_refreshBtn">刷新</button>
+            </div>
+        </section>
+
+        <p class="hyt_tip" id="hyt_tip">正在加载图文…</p>
+
+        <ul class="hyt_grid" id="hyt_grid"></ul>
+    </main>
+
+    <footer class="hyt_footer">
+        <a href="index.html">← 返回项目首页</a>
+    </footer>
+
+    <script src="js/hyt_gallery.js"></script>
+</body>
+</html>

@@ -6,6 +6,11 @@
  */
 
 const hyt_form = document.getElementById('hyt_dbForm');
+
+/** 直接双击打开 html 时，接口需指向本地后端（否则相对路径无法请求） */
+const hyt_apiUrl = location.protocol === 'file:'
+    ? 'http://localhost:8119/api/database/test'
+    : '/api/database/test';
 const hyt_userInput = document.getElementById('hyt_user');
 const hyt_pwdInput = document.getElementById('hyt_password');
 const hyt_submitBtn = document.getElementById('hyt_submitBtn');
@@ -71,7 +76,7 @@ async function hyt_onSubmit(hyt_event) {
     hyt_setTip('loading', '正在连接 MySQL，请稍候…');
 
     try {
-        const hyt_res = await fetch('/api/database/test', {
+        const hyt_res = await fetch(hyt_apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

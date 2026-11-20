@@ -19,8 +19,8 @@ hyt_app.use(cors());
 /* 解析 JSON 请求体 */
 hyt_app.use(express.json());
 
-/* 托管新前端静态资源：frontend/ */
-hyt_app.use(express.static(path.join(__dirname, '..', 'frontend')));
+/* 托管新前端静态资源：hyt-prompt/frontend/ */
+hyt_app.use(express.static(path.join(__dirname, '..', 'hyt-prompt', 'frontend')));
 
 /* 兼容根目录下的历史课堂练习页，统一走 /legacy 前缀 */
 hyt_app.use('/legacy', express.static(path.join(__dirname, '..')));
